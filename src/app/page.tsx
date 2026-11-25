@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import SnowEffect from "@/components/SnowEffect";
 import FairyLights from "@/components/FairyLights";
 import Navbar from "@/components/Navbar";
@@ -10,6 +11,7 @@ import RevealOnScroll from "@/components/RevealOnScroll";
 import { getSettings } from "@/lib/db";
 
 export default async function HomePage() {
+  await connection();
   const settings = await getSettings();
 
   return (

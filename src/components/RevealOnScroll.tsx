@@ -20,7 +20,6 @@ export default function RevealOnScroll({
     const el = ref.current;
     if (!el) return;
 
-    // Respect reduced motion preference immediately
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setIsVisible(true);
       return;
@@ -44,8 +43,9 @@ export default function RevealOnScroll({
     <div
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out will-change-transform ${
-        isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-[0.98]"
+      // Omit transform/will-change once visible so fixed modals inside never get trapped by a CSS containing block
+      className={`transition-all duration-700 ease-out ${
+        isVisible ? "opacity-100" : "opacity-0 translate-y-8 scale-[0.98] will-change-transform"
       } ${className}`}
     >
       {children}

@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import * as XLSX from "xlsx";
 import { Shield, Lock, Users, Shuffle, RefreshCw, Download, Upload, Trash2, CheckCircle2, Clock, AlertCircle, Database, ArrowLeft, Sparkles, FileSpreadsheet, Save, HelpCircle } from "lucide-react";
 import { IUser, IMatch, ISettings } from "@/lib/types";
+import { downloadSampleTemplate, exportMasterExcel, parseUsersFromExcelBuffer } from "@/lib/excelHelper";
 
 export default function AdminPage() {
   const [token, setToken] = useState<string>("");
@@ -199,61 +199,12 @@ export default function AdminPage() {
       alert("Chưa có dữ liệu thành viên để xuất file.");
       return;
     }
-
-    const exportRows = users.map((u, i) => {
-      const matchAsSanta = matches.find((m) => m.santaEmail.toLowerCase().trim() === u.email.toLowerCase().trim());
-      const matchAsRecipient = matches.find((m) => m.recipientEmail.toLowerCase().trim() === u.email.toLowerCase().trim());
-
-      return {
-        STT: i + 1,
-        "Họ và Tên": u.name,
-        "Email Công Ty": u.email,
-        "4 Số Cuối ĐT": u.phoneLast4,
-        "Phòng Ban": u.department,
-        "Đã Mở Xem": u.hasViewed ? "Đã xem" : "Chưa xem",
-        "Tặng Quà Cho (Recipient)": matchAsSanta ? `${matchAsSanta.recipientName} (${matchAsSanta.recipientDepartment})` : "Chưa ghép",
-        "Được Tặng Bởi (Santa)": matchAsRecipient ? `${matchAsRecipient.santaName} (${matchAsRecipient.santaDepartment})` : "Chưa ghép",
-        "Gợi Ý Hint 1": matchAsRecipient?.hints?.[0] || "",
-        "Gợi Ý Hint 2": matchAsRecipient?.hints?.[1] || "",
-        "Gợi Ý Hint 3": matchAsRecipient?.hints?.[2] || "",
-        "Wishlist Quà": u.wishlist || "",
-      };
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(exportRows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Secret_Santa_Master");
-    XLSX.writeFile(workbook, `Secret_Santa_Master_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportMasterExcel(users, matches);
   };
 
   // Download Sample Excel Template
   const handleDownloadTemplate = () => {
-    const sampleRows = [
-      {
-        "Họ và Tên": "Nguyễn Văn A",
-        Email: "vana.nguyen@company.com",
-        "4 Số Cuối ĐT": "1234",
-        "Phòng Ban": "Marketing",
-        "Link Ảnh Avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
-        "Wishlist Quà": "Bình giữ nhiệt hoặc nến thơm",
-        "Đôi Nét Bản Thân": "Thích nghe nhạc và đi phượt",
-        "Câu 1 (Món ăn)": "Bún chả",
-        "Câu 2 (Đồ uống)": "Trà đào",
-        "Câu 3 (Màu sắc)": "Xanh lá",
-        "Câu 4 (Phương tiện)": "Xe máy",
-        "Câu 5 (Cung hoàng đạo)": "Bạch Dương",
-        "Câu 6 (Câu cửa miệng)": "Ok em ơi",
-        "Câu 7 (Phim hay xem)": "Trinh thám",
-        "Câu 8 (Ca sĩ)": "Đen Vâu",
-        "Câu 9 (Điều ít ai biết)": "Biết thổi sáo",
-        "Câu 10 (Ước muốn Noel)": "Nghỉ ngơi",
-      },
-    ];
-
-    const worksheet = XLSX.utils.json_to_sheet(sampleRows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Mau_Nhap_Lieu");
-    XLSX.writeFile(workbook, "Mau_Danh_Sach_Secret_Santa.xlsx");
+    downloadSampleTemplate();
   };
 
   // Import Excel File
@@ -264,50 +215,13 @@ export default function AdminPage() {
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
-        const bstr = evt.target?.result;
-        const workbook = XLSX.read(bstr, { type: "binary" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const rawJson: any[] = XLSX.utils.sheet_to_json(sheet);
+        const buffer = evt.target?.result as ArrayBuffer;
+        const parsedUsers = parseUsersFromExcelBuffer(buffer);
 
-        if (rawJson.length === 0) {
-          alert("File Excel trống hoặc không đúng định dạng!");
+        if (parsedUsers.length === 0) {
+          alert("File Excel trống hoặc không đúng định dạng cột!");
           return;
         }
-
-        // Map columns
-        const parsedUsers: IUser[] = rawJson.map((row, idx) => {
-          const name = row["Họ và Tên"] || row["Tên"] || row["Name"] || `Nhân sự ${idx + 1}`;
-          const email = row["Email"] || row["Email Công Ty"] || row["Mail"] || `user${idx + 1}@company.com`;
-          const phoneLast4 = String(row["4 Số Cuối ĐT"] || row["SĐT Cuối"] || row["Phone"] || "0000").slice(-4);
-          const department = row["Phòng Ban"] || row["Bộ Phận"] || row["Department"] || "Chung";
-          const avatar = row["Link Ảnh Avatar"] || row["Ảnh"] || row["Avatar"] || "";
-          const wishlist = row["Wishlist Quà"] || row["Wishlist"] || "";
-          const bio = row["Đôi Nét Bản Thân"] || row["Bio"] || "";
-
-          // Extract questions
-          const questions: { question: string; answer: string }[] = [];
-          Object.keys(row).forEach((k) => {
-            if (k.startsWith("Câu ") || k.includes("?")) {
-              if (row[k]) {
-                questions.push({ question: k, answer: String(row[k]) });
-              }
-            }
-          });
-
-          return {
-            id: `u_import_${Date.now()}_${idx}`,
-            name,
-            email,
-            phoneLast4,
-            department,
-            avatar,
-            wishlist,
-            bio,
-            questions,
-            hasViewed: false,
-          };
-        });
 
         setIsLoading(true);
         const res = await fetch("/api/admin/users", {
@@ -334,7 +248,7 @@ export default function AdminPage() {
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
     };
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   };
 
   // Save Settings

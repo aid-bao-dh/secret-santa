@@ -33,6 +33,8 @@ export interface ISettingsDoc extends Document {
   eventDate: string;
   revealDate: string;
   companyDomain?: string;
+  companyName?: string;
+  companyLogo?: string;
   penalties: string[];
 }
 
@@ -79,6 +81,8 @@ const SettingsSchema = new Schema<ISettingsDoc>({
   eventDate: { type: String, default: "2026-12-24T18:00:00" },
   revealDate: { type: String, default: "2026-11-27T00:00:00" },
   companyDomain: { type: String, default: "" },
+  companyName: { type: String, default: "GLOBAL SAFE" },
+  companyLogo: { type: String, default: "/assets/logo.png" },
   penalties: [{ type: String }],
 });
 

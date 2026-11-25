@@ -81,10 +81,17 @@ function writeLocalData(data: LocalData) {
 let isConnected = false;
 
 export async function isMongoAvailable(): Promise<boolean> {
-  if (!MONGODB_URI) return false;
-  if (isConnected && mongoose.connection.readyState === 1) return true;
+  const uri = process.env.MONGODB_URI || MONGODB_URI;
+  if (!uri) return false;
+  if (mongoose.connection.readyState === 1) {
+    isConnected = true;
+    return true;
+  }
   try {
-    await mongoose.connect(MONGODB_URI, { bufferCommands: false });
+    await mongoose.connect(uri, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+    });
     isConnected = true;
     return true;
   } catch (err) {
@@ -336,7 +343,7 @@ export async function getSettings(): Promise<ISettings> {
       revealDate: doc.revealDate || DEFAULT_SETTINGS.revealDate,
       companyDomain: doc.companyDomain || "",
       companyName: doc.companyName || DEFAULT_SETTINGS.companyName,
-      companyLogo: doc.companyLogo || "",
+      companyLogo: doc.companyLogo ?? DEFAULT_SETTINGS.companyLogo,
       penalties: doc.penalties && doc.penalties.length > 0 ? doc.penalties : DEFAULT_SETTINGS.penalties,
     };
   }
@@ -361,7 +368,7 @@ export async function updateSettings(partial: Partial<ISettings>): Promise<ISett
       revealDate: updated.revealDate,
       companyDomain: updated.companyDomain || "",
       companyName: updated.companyName || DEFAULT_SETTINGS.companyName,
-      companyLogo: updated.companyLogo || "",
+      companyLogo: updated.companyLogo ?? DEFAULT_SETTINGS.companyLogo,
       penalties: updated.penalties || DEFAULT_SETTINGS.penalties,
     };
   }

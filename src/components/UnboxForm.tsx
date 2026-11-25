@@ -69,7 +69,7 @@ export default function UnboxForm() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto my-6 px-4">
+    <div className="w-full max-w-lg mx-auto my-6 pt-4 px-4">
       {/* 3D Festive Gift Box Hero */}
       <div className="text-center mb-6">
         <div

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { verifyAdminToken } from "@/lib/adminAuth";
 import { getSettings, updateSettings } from "@/lib/db";
 
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const updated = await updateSettings(body);
+    revalidatePath("/");
     return NextResponse.json({ success: true, settings: updated, message: "Đã cập nhật cài đặt thành công!" });
   } catch (error) {
     return NextResponse.json({ success: false, message: "Lỗi lưu cài đặt." }, { status: 500 });

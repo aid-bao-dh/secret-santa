@@ -198,6 +198,69 @@ body {
   45%, 100% { transform: translateX(220%) skewX(-20deg); }
 }
 
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+@keyframes letterUnfold {
+  0% {
+    opacity: 0;
+    transform: translateY(48px) scale(0.86);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes envelopeFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(-0.8deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.8deg);
+  }
+}
+
+@keyframes bokehDrift {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(18px, -22px) scale(1.12);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 24s linear infinite;
+}
+
+.animate-star-twinkle {
+  animation: starTwinkle 2.8s ease-in-out infinite;
+}
+
+.animate-letter-unfold {
+  animation: letterUnfold 0.72s cubic-bezier(0.34, 1.38, 0.64, 1) both;
+}
+
+.animate-envelope-float {
+  animation: envelopeFloat 4.8s ease-in-out infinite;
+}
+
+.animate-bokeh-drift {
+  animation: bokehDrift 9s ease-in-out infinite;
+}
+
 .animate-fade-up {
   animation: fadeUpIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -263,6 +326,11 @@ body {
   .animate-float-reverse,
   .animate-sleigh,
   .animate-gradient-flow,
+  .animate-spin-slow,
+  .animate-star-twinkle,
+  .animate-letter-unfold,
+  .animate-envelope-float,
+  .animate-bokeh-drift,
   .btn-shimmer::after {
     animation: none !important;
   }
