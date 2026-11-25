@@ -143,7 +143,7 @@ export async function generateSecretSantaCard(data: CardExportData): Promise<str
   ctx.textAlign = "center";
   ctx.font = `800 14px ${fontPrimary}`;
   ctx.fillStyle = "#fde047";
-  ctx.fillText("✦ TOP SECRET MISSION • NORTH POLE SPECIAL DELIVERY ✦", width / 2, 72);
+  ctx.fillText("✦ NHIỆM VỤ BÍ MẬT • SECRET SANTA GLOBAL SAFE ✦", width / 2, 72);
 
   ctx.font = `900 34px ${fontPrimary}`;
   ctx.fillStyle = "#ffffff";
@@ -416,7 +416,7 @@ export async function generateSecretSantaCard(data: CardExportData): Promise<str
 
   ctx.font = `600 12px ${fontPrimary}`;
   ctx.fillStyle = "#e2e8f0";
-  ctx.fillText("Secret Santa GLOBAL SAFE 2026 • North Pole Express", width / 2, 1078);
+  ctx.fillText("Secret Santa GLOBAL SAFE 2026 • Mùa Lễ Hội Gắn Kết", width / 2, 1078);
 
   return canvas.toDataURL("image/png");
 }

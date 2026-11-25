@@ -47,15 +47,16 @@ body {
 
 .snowflake {
   position: fixed;
-  top: -24px;
+  top: -28px;
   user-select: none;
   pointer-events: none;
   z-index: 40;
   animation-name: snow;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  animation-fill-mode: backwards;
   filter: drop-shadow(0 2px 4px rgba(148, 163, 184, 0.35));
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 /* Twinkling Christmas Fairy Lights */

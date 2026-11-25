@@ -20,6 +20,8 @@ export default async function HomePage() {
       <WelcomeLetter
         companyName={settings.companyName || "GLOBAL SAFE"}
         companyLogo={settings.companyLogo || "/assets/logo.png"}
+        revealDate={settings.revealDate || "2026-11-27T00:00:00"}
+        eventDate={settings.eventDate || "2026-12-24T18:00:00"}
       />
 
       {/* Clean Static Winter Backdrop (Bright, Elegant, Non-Distracting) */}
@@ -84,11 +86,11 @@ export default async function HomePage() {
             Mở phong thư bí mật từ Bắc Cực, trao gửi món quà yêu thương và cùng thử tài thám tử giải mã danh tính Santa của bạn! ✨🎁
           </p>
 
-          {/* Countdown to 27/11 */}
+          {/* Countdown to Reveal Date / Event Date */}
           <div className="animate-fade-up" style={{ animationDelay: "300ms" }}>
             <Countdown
-              targetDate={settings.revealDate || "2026-11-27T00:00:00"}
-              label="Đếm ngược đến giờ bóc Santa (27/11)"
+              revealDate={settings.revealDate || "2026-11-27T00:00:00"}
+              eventDate={settings.eventDate || "2026-12-24T18:00:00"}
             />
           </div>
         </header>

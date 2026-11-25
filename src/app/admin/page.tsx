@@ -24,8 +24,20 @@ export default function AdminPage() {
   // Settings editing
   const [rulesDraft, setRulesDraft] = useState<string>("");
   const [revealDateDraft, setRevealDateDraft] = useState<string>("");
+  const [eventDateDraft, setEventDateDraft] = useState<string>("");
   const [companyNameDraft, setCompanyNameDraft] = useState<string>("");
   const [companyLogoDraft, setCompanyLogoDraft] = useState<string>("");
+
+  const toDateTimeLocal = (val?: string, fallback = "2026-11-27T00:00") => {
+    if (!val) return fallback;
+    const m = val.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
+    return m ? m[1] : fallback;
+  };
+
+  const toIsoSeconds = (val: string) => {
+    if (!val) return "";
+    return val.length === 16 ? `${val}:00` : val;
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,9 +89,10 @@ export default function AdminPage() {
         setStats(data.stats || {});
         if (data.settings) {
           setRulesDraft(data.settings.rules || "");
-          setRevealDateDraft(data.settings.revealDate || "2026-11-27T00:00:00");
-          setCompanyNameDraft(data.settings.companyName || "CÔNG TY CHÚNG TA");
-          setCompanyLogoDraft(data.settings.companyLogo || "");
+          setRevealDateDraft(toDateTimeLocal(data.settings.revealDate, "2026-11-27T00:00"));
+          setEventDateDraft(toDateTimeLocal(data.settings.eventDate, "2026-12-24T18:00"));
+          setCompanyNameDraft(data.settings.companyName || "GLOBAL SAFE");
+          setCompanyLogoDraft(data.settings.companyLogo || "/assets/logo.png");
         }
       } else {
         setIsAuthenticated(false);
@@ -263,7 +276,8 @@ export default function AdminPage() {
         },
         body: JSON.stringify({
           rules: rulesDraft,
-          revealDate: revealDateDraft,
+          revealDate: toIsoSeconds(revealDateDraft),
+          eventDate: toIsoSeconds(eventDateDraft),
           companyName: companyNameDraft,
           companyLogo: companyLogoDraft,
         }),
@@ -612,10 +626,36 @@ export default function AdminPage() {
                 <input type="text" placeholder="https://... hoặc /logo.png" value={companyLogoDraft} onChange={(e) => setCompanyLogoDraft(e.target.value)} className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900 outline-none focus:border-red-500 font-medium" />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 mb-2">Ngày Mở Cổng Tra Cứu (Countdown)</label>
-                <input type="text" placeholder="2026-11-27T00:00:00" value={revealDateDraft} onChange={(e) => setRevealDateDraft(e.target.value)} className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900 outline-none focus:border-red-500 font-medium" />
-                <span className="text-[11px] text-stone-500 mt-1 block">Định dạng: YYYY-MM-DDTHH:mm:ss (Ví dụ: 2026-11-27T00:00:00)</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-2">
+                    Ngày Mở Cổng Bóc Quà (Countdown 1)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={revealDateDraft}
+                    onChange={(e) => setRevealDateDraft(e.target.value)}
+                    className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900 outline-none focus:border-red-500 font-medium"
+                  />
+                  <span className="text-[11px] text-stone-500 mt-1 block">
+                    Đồng hồ đếm ngược tới giờ bắt đầu bóc Santa
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-2">
+                    Ngày Diễn Ra Đêm Tiệc (Countdown 2)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={eventDateDraft}
+                    onChange={(e) => setEventDateDraft(e.target.value)}
+                    className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900 outline-none focus:border-emerald-600 font-medium"
+                  />
+                  <span className="text-[11px] text-stone-500 mt-1 block">
+                    Qua ngày mở cổng, đồng hồ tự đếm tiếp đến Đêm Tiệc
+                  </span>
+                </div>
               </div>
 
               <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-xs text-stone-700 space-y-2">
