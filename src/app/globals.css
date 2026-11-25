@@ -1,26 +1,299 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-holiday: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-nunito), var(--font-jakarta), system-ui, -apple-system, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fafaf9;
+  color: #1c1917;
+  font-family: var(--font-holiday);
+  overflow-x: hidden;
+  /* Fresh, bright snowy winter atmosphere with soft holiday warmth */
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 10% 25%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 65%, rgba(239, 68, 68, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.07) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+.font-holiday {
+  font-family: var(--font-holiday);
+}
+
+/* Snowflake animation with gentle wind drift */
+@keyframes snow {
+  0% {
+    transform: translateY(-5vh) translateX(0px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  35% {
+    transform: translateY(35vh) translateX(22px) rotate(120deg);
+  }
+  70% {
+    transform: translateY(70vh) translateX(-18px) rotate(240deg);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(105vh) translateX(12px) rotate(360deg);
+    opacity: 0.1;
+  }
+}
+
+.snowflake {
+  position: fixed;
+  top: -24px;
+  user-select: none;
+  pointer-events: none;
+  z-index: 40;
+  animation-name: snow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 2px 4px rgba(148, 163, 184, 0.35));
+  will-change: transform;
+}
+
+/* Twinkling Christmas Fairy Lights */
+@keyframes twinkle1 {
+  0%, 100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8)); }
+  50% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.3)); }
+}
+
+@keyframes twinkle2 {
+  0%, 100% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.3)); }
+  50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.8)); }
+}
+
+@keyframes twinkle3 {
+  0%, 100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.8)); }
+  50% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.3)); }
+}
+
+@keyframes twinkle4 {
+  0%, 100% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.3)); }
+  50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.8)); }
+}
+
+.bulb-red { animation: twinkle1 1.6s infinite ease-in-out; }
+.bulb-gold { animation: twinkle2 1.4s infinite ease-in-out; }
+.bulb-green { animation: twinkle3 1.8s infinite ease-in-out; }
+.bulb-blue { animation: twinkle4 1.5s infinite ease-in-out; }
+
+/* Gentle Pendulum Sway for hanging lights */
+@keyframes sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+.animate-sway {
+  transform-origin: top center;
+  animation: sway 3.4s ease-in-out infinite;
+}
+
+.animate-sway-reverse {
+  transform-origin: top center;
+  animation: sway 3.8s ease-in-out infinite reverse;
+}
+
+/* 3D Gift Animations */
+@keyframes giftHop {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  15% { transform: translateY(-14px) rotate(-6deg) scale(1.05); }
+  30% { transform: translateY(0) rotate(5deg) scale(1.03); }
+  45% { transform: translateY(-8px) rotate(-3deg); }
+  60% { transform: translateY(0) rotate(2deg); }
+}
+
+@keyframes giftExcited {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-10deg) scale(1.1); }
+  40% { transform: rotate(10deg) scale(1.14); }
+  60% { transform: rotate(-8deg) scale(1.12); }
+  80% { transform: rotate(8deg) scale(1.1); }
+}
+
+.animate-gift-hop {
+  animation: giftHop 3s ease-in-out infinite;
+}
+
+.animate-gift-excited {
+  animation: giftExcited 0.45s ease-in-out infinite;
+}
+
+/* Smooth Entrance & Micro-interaction Animations */
+@keyframes fadeUpIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(12px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(4deg); }
+}
+
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(8px) rotate(-4deg); }
+}
+
+@keyframes tickPop {
+  0% { transform: scale(1.14); opacity: 0.75; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes gradientFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes sleighFly {
+  0% {
+    transform: translateX(-18vw) translateY(10px) rotate(-3deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(50vw) translateY(-14px) rotate(2deg);
+    opacity: 0.85;
+  }
+  92% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(115vw) translateY(6px) rotate(-2deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmerSweep {
+  0% { transform: translateX(-140%) skewX(-20deg); }
+  45%, 100% { transform: translateX(220%) skewX(-20deg); }
+}
+
+.animate-fade-up {
+  animation: fadeUpIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-pop-in {
+  animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-float-slow {
+  animation: floatSlow 4.5s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 5.2s ease-in-out infinite;
+}
+
+.animate-tick {
+  animation: tickPop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-gradient-flow {
+  background-size: 200% auto;
+  animation: gradientFlow 6s ease infinite;
+}
+
+.animate-sleigh {
+  animation: sleighFly 22s linear infinite;
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.32),
+    transparent
+  );
+  animation: shimmerSweep 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowflake,
+  .bulb-red,
+  .bulb-gold,
+  .bulb-green,
+  .bulb-blue,
+  .animate-sway,
+  .animate-sway-reverse,
+  .animate-gift-hop,
+  .animate-gift-excited,
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-sleigh,
+  .animate-gradient-flow,
+  .btn-shimmer::after {
+    animation: none !important;
+  }
+}
+
+/* Festive candy stripe border */
+.candy-border {
+  border-image: repeating-linear-gradient(
+    -45deg,
+    #dc2626,
+    #dc2626 12px,
+    #ffffff 12px,
+    #ffffff 24px,
+    #16a34a 24px,
+    #16a34a 36px,
+    #ffffff 36px,
+    #ffffff 48px
+  ) 4;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #f87171;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;
 }
