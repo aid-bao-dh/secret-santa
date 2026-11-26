@@ -134,27 +134,11 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
         {/* CASE A: SEALED ENVELOPE (LÚC ĐẦU PHONG THƯ ĐÓNG KÍN, CẦN XÉ ĐỂ MỞ)        */}
         {/* ========================================================================= */}
         {!isEnvelopeOpened ? (
-          <div className="relative w-full bg-gradient-to-br from-[#fffdf5] via-[#fef6e9] to-[#faeee3] rounded-[18px] sm:rounded-[24px] p-6 sm:p-10 md:p-12 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden min-h-[460px] sm:min-h-[520px] flex flex-col justify-between">
-            {/* Ambient Background Warmth & Vintage Postcard Texture */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-400/15 blur-3xl" />
-              <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-red-500/15 blur-3xl" />
-              <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#92400e_1px,transparent_1px)] [background-size:18px_18px]" />
-            </div>
-
-            {/* Top Triangular Envelope Flap */}
-            <div
-              className={`absolute top-0 left-0 right-0 h-44 sm:h-56 overflow-hidden pointer-events-none z-10 transition-transform duration-700 origin-top ${
-                isTearingEnvelope ? "animate-flap-open-3d" : ""
-              }`}
-            >
-              <div
-                className="w-full h-full bg-gradient-to-b from-[#fbf5ea] via-[#f7eee1] to-[#eedbc6] shadow-[0_12px_24px_rgba(0,0,0,0.12)] border-b-2 border-stone-300"
-                style={{
-                  clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                }}
-              />
-            </div>
+          <div className="relative w-full bg-[#fcf9f2] rounded-[18px] sm:rounded-[24px] p-6 sm:p-10 md:p-12 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden min-h-[460px] sm:min-h-[520px] flex flex-col justify-between">
+            {/* Subtle vintage envelope fold line */}
+            <svg className="absolute top-0 left-0 right-0 w-full h-36 sm:h-44 pointer-events-none z-10 opacity-30" preserveAspectRatio="none" viewBox="0 0 100 100">
+              <path d="M 0 0 L 50 100 L 100 0" fill="none" stroke="#92400e" strokeWidth="1" strokeDasharray="3 3" />
+            </svg>
 
             {/* Top Bar: Airmail Stamp & Postmark Ink */}
             <div className="flex items-start justify-between relative z-20">
@@ -182,7 +166,7 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
             </div>
 
             {/* Center: Wax Seal, Perforated Rip Line & Unseal Action Button */}
-            <div className="my-auto py-6 relative z-30 text-center space-y-5">
+            <div className="my-auto py-6 relative z-30 text-center space-y-4 sm:space-y-5">
               {/* The Perforated Tear Line running horizontally across the envelope */}
               <div className="relative py-2 max-w-2xl mx-auto flex items-center justify-center">
                 <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#b45309_0px,#b45309_8px,transparent_8px,transparent_16px)] opacity-60" />
@@ -210,16 +194,15 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                 >
                   {/* Wax Seal Ribbon Tails */}
                   <div className="absolute top-10 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none -z-10">
-                    <div className="w-4 h-16 bg-gradient-to-b from-red-700 to-red-900 -rotate-12 shadow-md rounded-b-xs" />
-                    <div className="w-4 h-16 bg-gradient-to-b from-red-700 to-red-900 rotate-12 shadow-md rounded-b-xs" />
+                    <div className="w-3.5 h-14 bg-gradient-to-b from-red-700 to-red-900 -rotate-12 shadow-sm rounded-b-xs" />
+                    <div className="w-3.5 h-14 bg-gradient-to-b from-red-700 to-red-900 rotate-12 shadow-sm rounded-b-xs" />
                   </div>
 
                   {/* 3D Wax Seal Circle */}
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-900 p-1 shadow-[0_12px_30px_rgba(185,28,28,0.55),inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.5)] border-3 border-amber-300/70 flex flex-col items-center justify-center animate-seal-pulse">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-900 p-1 shadow-lg border-2 border-amber-300/80 flex flex-col items-center justify-center animate-seal-pulse">
                     <div className="w-full h-full rounded-full border border-dashed border-amber-200/50 flex flex-col items-center justify-center text-amber-100">
                       <span className="text-2xl sm:text-3xl select-none group-hover:rotate-12 transition-transform">🎄</span>
                       <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-amber-200 mt-0.5">TOP SECRET</span>
-                      <span className="text-[7px] sm:text-[8px] font-bold text-amber-300/80">SEALED</span>
                     </div>
                   </div>
                 </button>
@@ -235,7 +218,7 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                 </p>
               </div>
 
-              {/* Irresistible Action Button */}
+              {/* Action Button */}
               <div className="pt-2">
                 <button
                   type="button"
@@ -254,7 +237,7 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
             </div>
 
             {/* Bottom Bar: Vintage Envelope Address Lines */}
-            <div className="border-t border-dashed border-stone-300 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-stone-600 font-serif relative z-20 gap-2">
+            <div className="border-t border-dashed border-stone-300 pt-3 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-stone-600 relative z-20 gap-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="font-bold italic text-stone-800">from:</span>
                 <span className="font-black text-red-700 uppercase tracking-wider">{companyName}</span>
@@ -269,18 +252,9 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
           /* ========================================================================= */
           /* CASE B: OPENED CHRISTMAS POSTCARD (BƯU THIẾP ĐÃ ĐƯỢC XÉ MỞ RA)            */
           /* ========================================================================= */
-          <div className="relative w-full bg-gradient-to-br from-[#fffdf5] via-[#fef6e9] to-[#faeee3] rounded-[18px] sm:rounded-[24px] p-4 sm:p-7 md:p-8 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden animate-postcard-emerge">
-          {/* Festive atmospheric gradient glows inside the parchment */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {/* Soft warm golden amber glow in top-left behind Merry Christmas */}
-            <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-amber-400/15 blur-3xl pointer-events-none" />
-            {/* Festive soft holiday berry glow in bottom-right behind login */}
-            <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-red-500/12 blur-3xl pointer-events-none" />
-            {/* Pine green accent glow in bottom-left */}
-            <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-            {/* Subtle postal vintage stationery texture */}
-            <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#92400e_1px,transparent_1px)] [background-size:18px_18px]" />
-          </div>
+          <div className="relative w-full bg-[#fcf9f2] rounded-[18px] sm:rounded-[24px] p-4 sm:p-7 md:p-8 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden animate-postcard-emerge">
+            {/* Subtle vintage stationery dot texture */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(#92400e_1px,transparent_1px)] [background-size:18px_18px]" />
 
           {/* Grid Layout: Left (Merry Christmas & Rules) + Right (Stamp, To, From, Login Inputs) */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-7 md:gap-8 items-stretch relative z-10">
@@ -405,9 +379,20 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
             {/* ========================================================================= */}
             <div className="md:col-span-5 md:border-l md:border-dashed md:border-stone-300 md:pl-8 flex flex-col justify-between">
               <div>
-                {/* Top: Festive Airmail Postage Stamp */}
+                {/* Top: Festive Airmail Postage Stamp & Re-seal Option */}
                 <div className="flex items-start justify-between mb-4">
-                  <div className="text-xs font-mono uppercase tracking-widest text-stone-400">AIR MAIL • POSTCARD</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono uppercase tracking-widest text-stone-400">AIR MAIL • POSTCARD</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsEnvelopeOpened(false)}
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-red-700 text-[10px] font-bold border border-stone-300 transition cursor-pointer whitespace-nowrap shadow-xs"
+                      title="Đóng lại phong thư để xé lại"
+                    >
+                      <span>✉️</span>
+                      <span>Đóng phong bì</span>
+                    </button>
+                  </div>
 
                   {/* Stamp Card with dashed/perforated border */}
                   <div className="px-3 py-2 bg-amber-50/95 border-2 border-dashed border-red-500/80 rounded-xl text-center shadow-md rotate-2 transition-transform hover:rotate-0">
@@ -522,19 +507,8 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                     {/* Error Notification */}
                     {errorMsg && <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">⚠️ {errorMsg}</div>}
 
-                    {/* Submit Button (Envelope Tear Strip / Wax Seal Action) */}
-                    <div className="pt-3 relative">
-                      {/* Decorative perforated tear-strip indicator */}
-                      <div className="flex items-center gap-2 mb-2 px-1 opacity-70">
-                        <span className="text-xs select-none">✂️</span>
-                        <div className="flex-1 border-t-2 border-dashed border-stone-400" />
-                        <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-stone-500">
-                          XÉ THƯ NIÊM PHONG
-                        </span>
-                        <div className="flex-1 border-t-2 border-dashed border-stone-400" />
-                        <span className="text-xs select-none">💌</span>
-                      </div>
-
+                    {/* Submit Button */}
+                    <div className="pt-3">
                       <button
                         type="submit"
                         disabled={isLoading || isTearing}
@@ -559,20 +533,9 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                 )}
               </div>
 
-              {/* Postcard Postal Watermark with Re-seal Option */}
-              <div className="mt-4 pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400 font-mono">
-                <div className="flex items-center gap-2">
-                  <span>PAR AVION • ĐIỆN TỬ</span>
-                  <button
-                    type="button"
-                    onClick={() => setIsEnvelopeOpened(false)}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-bold border border-amber-300 transition cursor-pointer"
-                    title="Đóng lại phong thư để xé lại"
-                  >
-                    <span>✉️</span>
-                    <span>Đóng lại phong thư</span>
-                  </button>
-                </div>
+              {/* Postcard Postal Watermark */}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400 font-mono whitespace-nowrap">
+                <span>PAR AVION • ĐIỆN TỬ</span>
                 <span>GLOBAL SAFE 2026</span>
               </div>
             </div>
