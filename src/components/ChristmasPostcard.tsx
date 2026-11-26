@@ -111,10 +111,19 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
           )`,
         }}
       >
-        {/* Inner Parchment Card Body */}
-        <div className="relative w-full bg-[#fcf9f2] rounded-[18px] sm:rounded-[24px] p-4 sm:p-7 md:p-8 shadow-inner border border-amber-900/10 text-stone-800 overflow-hidden">
-          {/* Subtle Vintage Texture Accent */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#78350f_1px,transparent_1px)] [background-size:16px_16px]" />
+        {/* Inner Parchment Card Body - Cozy, Warm & Festive Holiday Gradient */}
+        <div className="relative w-full bg-gradient-to-br from-[#fffdf5] via-[#fef6e9] to-[#faeee3] rounded-[18px] sm:rounded-[24px] p-4 sm:p-7 md:p-8 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden">
+          {/* Festive atmospheric gradient glows inside the parchment */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {/* Soft warm golden amber glow in top-left behind Merry Christmas */}
+            <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-amber-400/15 blur-3xl pointer-events-none" />
+            {/* Festive soft holiday berry glow in bottom-right behind login */}
+            <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-red-500/12 blur-3xl pointer-events-none" />
+            {/* Pine green accent glow in bottom-left */}
+            <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+            {/* Subtle postal vintage stationery texture */}
+            <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#92400e_1px,transparent_1px)] [background-size:18px_18px]" />
+          </div>
 
           {/* Grid Layout: Left (Merry Christmas & Rules) + Right (Stamp, To, From, Login Inputs) */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-7 md:gap-8 items-stretch relative z-10">
@@ -138,7 +147,7 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                 </div>
 
                 {/* Cute Festive Holiday Illustration Cluster (Gnome, Tree, Santa Mailbox) */}
-                <div className="flex items-center gap-4 my-4 p-3 bg-white/80 rounded-2xl border border-amber-200/60 shadow-xs">
+                <div className="flex items-center gap-4 my-4 p-3 bg-gradient-to-r from-amber-100/75 via-white/80 to-red-50/65 rounded-2xl border border-amber-300/80 shadow-xs">
                   <div className="flex items-center gap-2 text-3xl sm:text-4xl select-none">
                     <span className="animate-sway inline-block">🎅</span>
                     <span className="animate-float-slow inline-block">🎄</span>
@@ -156,7 +165,7 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                   </div>
 
                   {customRules ? (
-                    <div className="p-3.5 bg-white/95 rounded-2xl border border-stone-200 text-xs sm:text-sm text-stone-700 leading-relaxed space-y-1.5 font-normal max-h-64 overflow-y-auto">
+                    <div className="p-3.5 bg-gradient-to-br from-amber-50/90 via-white/95 to-red-50/60 rounded-2xl border-2 border-amber-200/80 text-xs sm:text-sm text-stone-700 leading-relaxed space-y-1.5 font-normal max-h-64 overflow-y-auto shadow-xs">
                       {customRules.split("\n").map((line, idx) => {
                         const trimmed = line.trim();
                         if (!trimmed) return <div key={idx} className="h-0.5" />;
@@ -472,14 +481,19 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
               <div className="space-y-2.5 pt-1">
                 <button
                   type="button"
+                  disabled={!hasConfirmedAlone}
                   onClick={handleConfirmAndProceed}
-                  className="btn-shimmer group w-full py-3.5 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-black rounded-2xl shadow-[0_0_35px_rgba(220,38,38,0.65)] transition-all hover:scale-[1.01] active:scale-98 border-2 border-red-400 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2.5"
+                  className={`btn-shimmer group w-full py-3.5 sm:py-4 px-3 sm:px-6 font-black rounded-2xl border-2 transition-all flex items-center justify-center gap-2 ${
+                    hasConfirmedAlone
+                      ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white shadow-[0_0_35px_rgba(220,38,38,0.7)] hover:scale-[1.01] active:scale-98 border-red-400 cursor-pointer"
+                      : "bg-stone-800/90 text-stone-500 border-stone-700/80 cursor-not-allowed opacity-60 shadow-none"
+                  }`}
                 >
-                  <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                  <span className="text-xs min-[380px]:text-sm sm:text-base font-black tracking-tight whitespace-nowrap">
-                    TÔI ĐANG Ở MỘT MÌNH — MỞ THƯ NGAY 🔥
+                  <ShieldAlert className="w-5 h-5 shrink-0" />
+                  <span className="text-sm sm:text-base font-black tracking-wider uppercase whitespace-nowrap">
+                    MỞ THƯ NGAY 🔥
                   </span>
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 shrink-0 group-hover:translate-x-1 transition-transform" />
                 </button>
 
                 <button
