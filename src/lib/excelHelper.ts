@@ -167,10 +167,29 @@ export function downloadSampleTemplate(): void {
 }
 
 /**
- * Exports current users and Secret Santa match results to a formatted Master Excel file.
+ * Exports current users and Secret Santa match results to a beautifully formatted Master Excel file
+ * with 3 organized sheets:
+ * 1. Ket_Qua_Secret_Santa: Master matching records with full info & autofilter
+ * 2. Diem_Danh_Dem_Tiec: Convenient print-ready checklist for the MC & Party Night on Dec 24
+ * 3. Bao_Cao_Thong_Ke: Executive dashboard summary with statistics, department breakdown and rules
  */
-export function exportMasterExcel(users: IUser[], matches: IMatch[]): void {
-  const exportRows = users.map((u, i) => {
+export function exportMasterExcel(
+  users: IUser[],
+  matches: IMatch[],
+  companyName = "GLOBAL SAFE"
+): void {
+  const now = new Date();
+  const formattedDate = `${String(now.getDate()).padStart(2, "0")}/${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}/${now.getFullYear()}`;
+  const formattedTime = `${String(now.getHours()).padStart(2, "0")}:${String(
+    now.getMinutes()
+  ).padStart(2, "0")}`;
+
+  // =========================================================================
+  // SHEET 1: KẾT QUẢ GHÉP CẶP SECRET SANTA (MASTER MATCHING LIST)
+  // =========================================================================
+  const masterRows = users.map((u, i) => {
     const matchAsSanta = matches.find(
       (m) => m.santaEmail.toLowerCase().trim() === u.email.toLowerCase().trim()
     );
@@ -179,43 +198,185 @@ export function exportMasterExcel(users: IUser[], matches: IMatch[]): void {
     );
 
     return {
-      STT: i + 1,
-      "Họ và Tên": u.name,
+      "STT": i + 1,
+      "Họ và Tên (Santa)": u.name,
       "Email Công Ty": u.email,
       "4 Số Cuối ĐT": u.phoneLast4,
-      "Phòng Ban": u.department,
-      "Đã Mở Xem": u.hasViewed ? "Đã xem" : "Chưa xem",
-      "Tặng Quà Cho (Recipient)": matchAsSanta
-        ? `${matchAsSanta.recipientName} (${matchAsSanta.recipientDepartment})`
+      "Phòng Ban (Santa)": u.department,
+      "Trạng Thái Mở Thư": u.hasViewed ? "✅ Đã Xem Thẻ" : "⏳ Chưa Xem",
+      "Người Nhận Quà (Recipient)": matchAsSanta
+        ? matchAsSanta.recipientName
         : "Chưa ghép",
-      "Được Tặng Bởi (Santa)": matchAsRecipient
+      "Phòng Ban Người Nhận": matchAsSanta
+        ? matchAsSanta.recipientDepartment
+        : "Chưa ghép",
+      "Email Người Nhận": matchAsSanta ? matchAsSanta.recipientEmail : "",
+      "Đôi Nét Về Người Nhận": matchAsSanta
+        ? users.find(
+            (usr) =>
+              usr.email.toLowerCase().trim() ===
+              matchAsSanta.recipientEmail.toLowerCase().trim()
+          )?.bio || "Đồng nghiệp thân thiện"
+        : "",
+      "Được Tặng Bởi (Santa Của Mình)": matchAsRecipient
         ? `${matchAsRecipient.santaName} (${matchAsRecipient.santaDepartment})`
         : "Chưa ghép",
-      "Gợi Ý Hint 1": matchAsRecipient?.hints?.[0] || "",
-      "Gợi Ý Hint 2": matchAsRecipient?.hints?.[1] || "",
-      "Gợi Ý Hint 3": matchAsRecipient?.hints?.[2] || "",
+      "Gợi Ý Manh Mối 1": matchAsRecipient?.hints?.[0] || "",
+      "Gợi Ý Manh Mối 2": matchAsRecipient?.hints?.[1] || "",
+      "Gợi Ý Manh Mối 3": matchAsRecipient?.hints?.[2] || "",
+      "Ngân Sách Quà": "Dưới 200.000 VNĐ (Tự do)",
     };
   });
 
-  const worksheet = XLSX.utils.json_to_sheet(exportRows);
-  worksheet["!cols"] = [
+  const wsMaster = XLSX.utils.json_to_sheet(masterRows);
+  wsMaster["!cols"] = [
+    { wch: 6 },  // STT
+    { wch: 24 }, // Họ và Tên (Santa)
+    { wch: 30 }, // Email Công Ty
+    { wch: 14 }, // 4 Số Cuối ĐT
+    { wch: 18 }, // Phòng Ban (Santa)
+    { wch: 18 }, // Trạng Thái Mở Thư
+    { wch: 24 }, // Người Nhận Quà
+    { wch: 22 }, // Phòng Ban Người Nhận
+    { wch: 30 }, // Email Người Nhận
+    { wch: 36 }, // Đôi Nét Về Người Nhận
+    { wch: 28 }, // Được Tặng Bởi
+    { wch: 36 }, // Gợi Ý 1
+    { wch: 36 }, // Gợi Ý 2
+    { wch: 36 }, // Gợi Ý 3
+    { wch: 26 }, // Ngân Sách Quà
+  ];
+  wsMaster["!rows"] = [
+    { hpt: 30 },
+    ...masterRows.map(() => ({ hpt: 22 })),
+  ];
+  wsMaster["!autofilter"] = {
+    ref: `A1:O${masterRows.length + 1}`,
+  };
+
+  // Ensure "4 Số Cuối ĐT" retains string format '@' with leading zeros
+  for (let r = 2; r <= masterRows.length + 1; r++) {
+    const cellRef = `D${r}`;
+    if (wsMaster[cellRef]) {
+      wsMaster[cellRef].t = "s";
+      wsMaster[cellRef].z = "@";
+    }
+  }
+
+  // =========================================================================
+  // SHEET 2: CHECKLIST ĐÊM TIỆC GIÁNG SINH (PARTY NIGHT CHECKLIST)
+  // =========================================================================
+  const partyRows = users.map((u, i) => {
+    const matchAsSanta = matches.find(
+      (m) => m.santaEmail.toLowerCase().trim() === u.email.toLowerCase().trim()
+    );
+
+    return {
+      "STT": i + 1,
+      "Họ và Tên Santa": u.name,
+      "Phòng Ban Santa": u.department,
+      "Người Nhận Quà": matchAsSanta ? matchAsSanta.recipientName : "Chưa ghép",
+      "Phòng Ban Nhận": matchAsSanta ? matchAsSanta.recipientDepartment : "Chưa ghép",
+      "Đã Mang Quà Đến? [  ]": "[  ] Đã giao quà",
+      "Người Nhận Đoán Đúng? [  ]": "[  ] Đúng / Sai",
+      "Chịu Phạt Vòng Quay?": "",
+      "Ghi Chú Ban Tổ Chức": "",
+    };
+  });
+
+  const wsParty = XLSX.utils.json_to_sheet(partyRows);
+  wsParty["!cols"] = [
     { wch: 6 },
     { wch: 24 },
+    { wch: 18 },
+    { wch: 24 },
+    { wch: 18 },
+    { wch: 24 },
+    { wch: 26 },
+    { wch: 22 },
     { wch: 30 },
-    { wch: 14 },
-    { wch: 16 },
-    { wch: 12 },
-    { wch: 30 },
-    { wch: 30 },
-    { wch: 36 },
-    { wch: 36 },
-    { wch: 36 },
   ];
-  worksheet["!rows"] = [{ hpt: 28 }];
+  wsParty["!rows"] = [
+    { hpt: 30 },
+    ...partyRows.map(() => ({ hpt: 24 })),
+  ];
+  wsParty["!autofilter"] = {
+    ref: `A1:I${partyRows.length + 1}`,
+  };
 
+  // =========================================================================
+  // SHEET 3: BÁO CÁO THỐNG KÊ TỔNG HỢP (EXECUTIVE DASHBOARD SUMMARY)
+  // =========================================================================
+  const viewedCount = users.filter((u) => u.hasViewed).length;
+  const deptMap: Record<string, number> = {};
+  users.forEach((u) => {
+    const dept = u.department?.trim() || "Chung";
+    deptMap[dept] = (deptMap[dept] || 0) + 1;
+  });
+
+  const summaryData: (string | number)[][] = [
+    [`BÁO CÁO TỔNG QUAN SECRET SANTA 2026 - ${companyName}`],
+    [`Thời gian xuất dữ liệu: ${formattedTime} ngày ${formattedDate}`],
+    [],
+    ["CHỈ SỐ TỔNG HỢP", "GIÁ TRỊ", "GHI CHÚ / ĐÁNH GIÁ"],
+    ["Tổng số thành viên tham gia", users.length, "Đã có trong hệ thống"],
+    ["Số cặp đã ghép thành công", matches.length, matches.length === users.length ? "Đã ghép đủ 100%" : "Chưa ghép đủ"],
+    ["Số người đã mở xem thẻ quà", viewedCount, `${users.length > 0 ? Math.round((viewedCount / users.length) * 100) : 0}% hoàn thành mở thẻ`],
+    ["Số người chưa mở thẻ quà", users.length - viewedCount, "BTC cần tiếp tục nhắc nhở"],
+    ["Tổng số phòng ban tham gia", Object.keys(deptMap).length, "Đảm bảo ghép khác phòng ban"],
+    [],
+    ["PHÂN BỔ THEO PHÒNG BAN", "SỐ LƯỢNG NHÂN SỰ", "TỶ LỆ (%)"],
+    ...Object.entries(deptMap).map(([dept, count]) => [
+      dept,
+      count,
+      `${users.length > 0 ? Math.round((count / users.length) * 100) : 0}%`,
+    ]),
+    [],
+    ["QUY ĐỊNH & THỂ LỆ SỰ KIỆN", "NỘI DUNG CHI TIẾT"],
+    ["1. Ngân sách quà tặng", "Dưới 200.000 VNĐ. Tự do sáng tạo món quà bất ngờ, ý nghĩa và chân thành."],
+    ["2. Bí mật tuyệt đối", "Giữ kín danh tính người mình tặng và danh tính Santa của mình đến đêm tiệc."],
+    ["3. Ghép cặp khác bộ phận", "Thuật toán đảm bảo không ghép người cùng phòng ban để tăng tính gắn kết."],
+    ["4. Vòng quay hình phạt", "Ai quên chuẩn bị quà hoặc đoán sai Santa trong buổi tiệc sẽ phải chịu phạt."],
+  ];
+
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+  wsSummary["!cols"] = [
+    { wch: 32 },
+    { wch: 24 },
+    { wch: 48 },
+  ];
+  wsSummary["!rows"] = [
+    { hpt: 28 }, // Title
+    { hpt: 20 }, // Date
+    { hpt: 12 }, // Empty
+    { hpt: 26 }, // Header 1
+    { hpt: 22 },
+    { hpt: 22 },
+    { hpt: 22 },
+    { hpt: 22 },
+    { hpt: 22 },
+    { hpt: 12 },
+    { hpt: 26 }, // Header 2
+    ...Object.keys(deptMap).map(() => ({ hpt: 20 })),
+    { hpt: 12 },
+    { hpt: 26 }, // Header 3
+    { hpt: 22 },
+    { hpt: 22 },
+    { hpt: 22 },
+    { hpt: 22 },
+  ];
+
+  // =========================================================================
+  // APPEND SHEETS TO WORKBOOK & DOWNLOAD
+  // =========================================================================
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Secret_Santa_Master");
-  XLSX.writeFile(workbook, `Secret_Santa_Master_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.utils.book_append_sheet(workbook, wsMaster, "Ket_Qua_Secret_Santa");
+  XLSX.utils.book_append_sheet(workbook, wsParty, "Diem_Danh_Dem_Tiec");
+  XLSX.utils.book_append_sheet(workbook, wsSummary, "Bao_Cao_Thong_Ke");
+
+  const safeCompanyName = companyName.replace(/\s+/g, "_");
+  const fileName = `Ket_Qua_Secret_Santa_${safeCompanyName}_${now.toISOString().slice(0, 10)}.xlsx`;
+  XLSX.writeFile(workbook, fileName);
 }
 
 function normalizeAvatarUrl(raw: string): string {

@@ -284,7 +284,7 @@ export default function AdminPage() {
       alert("Chưa có dữ liệu thành viên để xuất file.");
       return;
     }
-    exportMasterExcel(users, matches);
+    exportMasterExcel(users, matches, companyNameDraft || "GLOBAL SAFE");
   };
 
   // Download Sample Excel Template
