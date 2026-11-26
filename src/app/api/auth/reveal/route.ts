@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserByEmail, getMatchForSanta, getMatchForRecipient, getUsers, markUserViewed } from "@/lib/db";
+import { getUserByEmail, getMatchForSanta, getMatchForRecipient, getUsers, getSettings, markUserViewed } from "@/lib/db";
+
+function formatDayMonth(dateStr?: string, fallback = "27/11"): string {
+  if (!dateStr) return fallback;
+  const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}` : fallback;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,11 +49,13 @@ export async function POST(req: NextRequest) {
     const matchAsRecipient = await getMatchForRecipient(cleanEmail);
 
     if (!matchAsSanta || !matchAsRecipient) {
+      const settings = await getSettings();
+      const dayLabel = formatDayMonth(settings.revealDate, "27/11");
       return NextResponse.json({
         success: false,
         notMatchedYet: true,
         userName: user.name,
-        message: "Ban tổ chức đang chuẩn bị danh sách ghép cặp. Bạn vui lòng quay lại vào ngày công bố (27/11) nhé! 🎄",
+        message: `Ban tổ chức đang chuẩn bị danh sách ghép cặp. Bạn vui lòng quay lại vào ngày công bố (${dayLabel}) nhé! 🎄`,
       });
     }
 
@@ -75,13 +83,12 @@ export async function POST(req: NextRequest) {
         department: recipientUser ? recipientUser.department : matchAsSanta.recipientDepartment,
         avatar: recipientUser?.avatar || "",
         bio: recipientUser?.bio || "",
-        wishlist: recipientUser?.wishlist || "Chưa cập nhật sở thích cụ thể, hãy chọn món quà thật bất ngờ nhé!",
       },
       // Hints of who is YOUR Santa (identity concealed!)
       santaHints: matchAsRecipient.hints || [],
       wasViewedBefore: wasViewed,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Reveal API Error:", error);
     return NextResponse.json(
       { success: false, message: "Có lỗi xảy ra trên hệ thống. Vui lòng thử lại sau." },

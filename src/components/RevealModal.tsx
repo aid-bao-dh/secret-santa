@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 import {
   Gift,
   Download,
   HelpCircle,
-  Heart,
+  Sparkles,
   Building,
   X,
   ShieldCheck,
@@ -27,7 +27,6 @@ interface RevealModalProps {
       department: string;
       avatar: string;
       bio?: string;
-      wishlist?: string;
     };
     santaHints: string[];
     wasViewedBefore?: boolean;
@@ -35,15 +34,20 @@ interface RevealModalProps {
   onClose: () => void;
 }
 
+const emptySubscribe = () => () => {};
+
 export default function RevealModal({ data, onClose }: RevealModalProps) {
   const [activeTab, setActiveTab] = useState<"recipient" | "hints">("recipient");
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
-  const [mounted, setMounted] = useState(false);
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
-    setMounted(true);
-
     try {
       confetti({
         particleCount: 120,
@@ -202,28 +206,28 @@ export default function RevealModal({ data, onClose }: RevealModalProps) {
                   </span>
                 </div>
 
-                {/* Wishlist Box */}
-                <div className="w-full mt-5 p-4 bg-red-50/70 border border-red-200 rounded-2xl shadow-inner text-left">
-                  <div className="flex items-center gap-2 text-red-700 font-bold text-xs uppercase tracking-wider mb-1.5">
-                    <Heart className="w-4 h-4 text-red-600 fill-red-600" />
-                    <span>Món Quà Mong Muốn (Wishlist):</span>
-                  </div>
-                  <p className="text-stone-800 text-sm italic leading-relaxed font-serif">
-                    &ldquo;{data.giftRecipient.wishlist || "Chưa cập nhật sở thích cụ thể, hãy chọn một món quà ấm áp và bất ngờ nhé!"}&rdquo;
-                  </p>
-                </div>
-
                 {/* Bio (if any) */}
                 {data.giftRecipient.bio && (
-                  <div className="w-full mt-3 p-3 bg-stone-50 rounded-xl text-left border border-stone-200">
+                  <div className="w-full mt-4 p-3.5 bg-stone-50 rounded-2xl text-left border border-stone-200">
                     <span className="text-[11px] font-bold text-stone-500 uppercase block mb-0.5">
                       Đôi nét về đồng nghiệp:
                     </span>
-                    <p className="text-xs text-stone-700 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
                       {data.giftRecipient.bio}
                     </p>
                   </div>
                 )}
+
+                {/* Free Gift Budget Guide (< 200k) */}
+                <div className="w-full mt-4 p-4 bg-red-50/70 border border-red-200 rounded-2xl shadow-inner text-left">
+                  <div className="flex items-center gap-2 text-red-700 font-bold text-xs uppercase tracking-wider mb-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>Gợi Ý Chuẩn Bị Quà (Dưới 200.000đ):</span>
+                  </div>
+                  <p className="text-stone-800 text-xs sm:text-sm leading-relaxed font-medium">
+                    Mọi người tự do chọn một món quà bất ngờ, thú vị hoặc thiết thực trong khoảng giá trị <strong className="text-red-700 font-bold">dưới 200.000đ</strong> để dành tặng đồng nghiệp nhé! 🎁
+                  </p>
+                </div>
               </div>
 
               <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 text-center flex items-center justify-center gap-2 font-medium">

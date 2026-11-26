@@ -8,7 +8,6 @@ const TEMPLATE_HEADERS = [
   "4 Số Cuối ĐT",
   "Phòng Ban",
   "Link Ảnh Avatar",
-  "Wishlist Quà",
   "Đôi Nét Bản Thân",
   "Câu 1: Món ăn yêu thích nhất",
   "Câu 2: Đồ uống chân ái khi làm việc",
@@ -29,8 +28,7 @@ const TEMPLATE_COL_WIDTHS = [
   { wch: 15 }, // 4 Số Cuối ĐT
   { wch: 18 }, // Phòng Ban
   { wch: 42 }, // Link Ảnh Avatar
-  { wch: 38 }, // Wishlist Quà
-  { wch: 38 }, // Đôi Nét Bản Thân
+  { wch: 40 }, // Đôi Nét Bản Thân
   { wch: 30 }, // Câu 1
   { wch: 34 }, // Câu 2
   { wch: 26 }, // Câu 3
@@ -56,7 +54,6 @@ export function downloadSampleTemplate(): void {
       "4 Số Cuối ĐT": "1234",
       "Phòng Ban": "Marketing",
       "Link Ảnh Avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
-      "Wishlist Quà": "Bình giữ nhiệt màu pastel hoặc nến thơm mùi quế",
       "Đôi Nét Bản Thân": "Thích bắt trend TikTok, fan trà sữa 0% đường",
       "Câu 1: Món ăn yêu thích nhất": "Bún chả phố cổ nhiều tỏi ớt",
       "Câu 2: Đồ uống chân ái khi làm việc": "Trà sữa ô long 0 đường nhiều trân châu",
@@ -76,7 +73,6 @@ export function downloadSampleTemplate(): void {
       "4 Số Cuối ĐT": "0568",
       "Phòng Ban": "Tech",
       "Link Ảnh Avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-      "Wishlist Quà": "Lót chuột cỡ lớn, keycap hoặc móc khóa mini",
       "Đôi Nét Bản Thân": "Fullstack Dev thích gõ phím cơ và uống Americano",
       "Câu 1: Món ăn yêu thích nhất": "Pizza phô mai bò băm",
       "Câu 2: Đồ uống chân ái khi làm việc": "Americano đá không đường",
@@ -98,7 +94,7 @@ export function downloadSampleTemplate(): void {
   // Set readable column widths, header height & autofilter
   wsData["!cols"] = TEMPLATE_COL_WIDTHS;
   wsData["!rows"] = [{ hpt: 28 }, { hpt: 24 }, { hpt: 24 }];
-  wsData["!autofilter"] = { ref: "A1:R3" };
+  wsData["!autofilter"] = { ref: "A1:Q3" };
 
   // Ensure "4 Số Cuối ĐT" column (D2, D3) keeps string format with leading zeroes
   for (const cellRef of ["D2", "D3"]) {
@@ -147,10 +143,10 @@ export function downloadSampleTemplate(): void {
         "Dán URL ảnh trực tiếp hoặc link Google Drive đã bật quyền 'Bất kỳ ai có đường liên kết' (hệ thống tự chuyển đổi link Drive khi Import).",
     },
     {
-      "Cột / Mục": "Wishlist Quà & Đôi Nét Bản Thân",
+      "Cột / Mục": "Đôi Nét Bản Thân",
       "Bắt buộc": "Khuyến khích",
       "Hướng dẫn & Lưu ý cho Ban Tổ Chức (Linh, Bảo, Nhi)":
-        "Giúp Santa chọn quà đúng sở thích. Có thể để trống nếu không có yêu cầu đặc biệt.",
+        "Giới thiệu ngắn về đồng nghiệp. Quà tặng sẽ tự do lựa chọn bất ngờ trong khoảng giá trị dưới 200.000đ.",
     },
     {
       "Cột / Mục": "Câu 1 -> Câu 10",
@@ -198,7 +194,6 @@ export function exportMasterExcel(users: IUser[], matches: IMatch[]): void {
       "Gợi Ý Hint 1": matchAsRecipient?.hints?.[0] || "",
       "Gợi Ý Hint 2": matchAsRecipient?.hints?.[1] || "",
       "Gợi Ý Hint 3": matchAsRecipient?.hints?.[2] || "",
-      "Wishlist Quà": u.wishlist || "",
     };
   });
 
@@ -212,7 +207,6 @@ export function exportMasterExcel(users: IUser[], matches: IMatch[]): void {
     { wch: 12 },
     { wch: 30 },
     { wch: 30 },
-    { wch: 36 },
     { wch: 36 },
     { wch: 36 },
     { wch: 36 },

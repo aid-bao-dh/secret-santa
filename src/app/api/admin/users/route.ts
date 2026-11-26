@@ -3,6 +3,8 @@ import { verifyAdminToken } from "@/lib/adminAuth";
 import { bulkSaveUsers, clearUsers, getUsers } from "@/lib/db";
 import { IUser } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   if (!verifyAdminToken(req)) {
     return NextResponse.json({ success: false, message: "Không có quyền truy cập." }, { status: 401 });
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
       message: `Đã lưu thành công ${cleaned.length} thành viên!`,
       totalUsers: updatedUsers.length,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Users save error:", error);
     return NextResponse.json({ success: false, message: "Lỗi lưu dữ liệu nhân sự." }, { status: 500 });
   }
@@ -54,7 +56,8 @@ export async function DELETE(req: NextRequest) {
   try {
     await clearUsers();
     return NextResponse.json({ success: true, message: "Đã xóa toàn bộ danh sách thành viên và ghép cặp." });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("Clear users error:", error);
     return NextResponse.json({ success: false, message: "Lỗi xóa danh sách." }, { status: 500 });
   }
 }

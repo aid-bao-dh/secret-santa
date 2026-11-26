@@ -3,6 +3,8 @@ import { verifyAdminToken } from "@/lib/adminAuth";
 import { getUsers, saveMatches, clearMatches } from "@/lib/db";
 import { generateMatches } from "@/lib/matching";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   if (!verifyAdminToken(req)) {
     return NextResponse.json({ success: false, message: "Không có quyền truy cập." }, { status: 401 });
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
       sameDepartmentCount: result.sameDepartmentCount,
       warnings: result.warnings,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Match error:", error);
     return NextResponse.json({ success: false, message: "Lỗi ghép cặp." }, { status: 500 });
   }
@@ -48,7 +50,8 @@ export async function DELETE(req: NextRequest) {
   try {
     await clearMatches();
     return NextResponse.json({ success: true, message: "Đã hủy toàn bộ kết quả ghép cặp." });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("Reset match error:", error);
     return NextResponse.json({ success: false, message: "Lỗi hủy ghép cặp." }, { status: 500 });
   }
 }

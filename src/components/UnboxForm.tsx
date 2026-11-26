@@ -6,6 +6,22 @@ import { Gift, Lock, Mail, Sparkles, AlertCircle, ArrowRight, ShieldCheck } from
 import RevealModal from "./RevealModal";
 import { playChristmasChime } from "./WelcomeLetter";
 
+interface RevealData {
+  currentUser: {
+    name: string;
+    email: string;
+    department: string;
+  };
+  giftRecipient: {
+    name: string;
+    department: string;
+    avatar: string;
+    bio?: string;
+  };
+  santaHints: string[];
+  wasViewedBefore?: boolean;
+}
+
 export default function UnboxForm() {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
@@ -13,7 +29,7 @@ export default function UnboxForm() {
   const [isShaking, setIsShaking] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [notMatchedMsg, setNotMatchedMsg] = useState<string | null>(null);
-  const [revealData, setRevealData] = useState<any>(null);
+  const [revealData, setRevealData] = useState<RevealData | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +76,7 @@ export default function UnboxForm() {
       }
 
       setRevealData(data);
-    } catch (err) {
+    } catch {
       setErrorMsg("Có lỗi kết nối đến máy chủ. Vui lòng thử lại sau.");
     } finally {
       setIsLoading(false);

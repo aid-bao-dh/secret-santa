@@ -7,7 +7,6 @@ export interface CardExportData {
     name: string;
     department: string;
     avatar?: string;
-    wishlist?: string;
     bio?: string;
   };
   santaHints: string[];
@@ -296,29 +295,29 @@ export async function generateSecretSantaCard(data: CardExportData): Promise<str
   ctx.fillStyle = "#d1fae5";
   ctx.fillText(deptLabel, width / 2, sec1Y + 258);
 
-  // Wishlist Box
-  const wishX = sec1X + 30;
-  const wishY = sec1Y + 282;
-  const wishW = sec1W - 60;
-  const wishH = 124;
+  // Gift Budget & Bio Box (No Wishlist — Free Gift under 200k)
+  const noteX = sec1X + 30;
+  const noteY = sec1Y + 282;
+  const noteW = sec1W - 60;
+  const noteH = 124;
 
   ctx.fillStyle = "#fefce8";
-  roundRect(wishX, wishY, wishW, wishH, 14, true, false);
+  roundRect(noteX, noteY, noteW, noteH, 14, true, false);
   ctx.strokeStyle = "#fde047";
   ctx.lineWidth = 1.5;
-  roundRect(wishX, wishY, wishW, wishH, 14, false, true);
+  roundRect(noteX, noteY, noteW, noteH, 14, false, true);
 
   ctx.textAlign = "left";
   ctx.font = `800 13px ${fontPrimary}`;
   ctx.fillStyle = "#b45309";
-  ctx.fillText("❤️ Wishlist / Món quà mong muốn:", wishX + 18, wishY + 28);
+  ctx.fillText("🎁 QUÀ TẶNG TỰ DO • GIÁ TRỊ DƯỚI 200.000Đ:", noteX + 18, noteY + 28);
 
-  ctx.font = `italic 600 16px ${fontPrimary}`;
+  ctx.font = `600 15px ${fontPrimary}`;
   ctx.fillStyle = "#1c1917";
-  const wishlistText =
-    data.giftRecipient.wishlist ||
-    "Chưa cập nhật sở thích cụ thể, hãy chọn một món quà thật bất ngờ nhé!";
-  wrapText(`"${wishlistText}"`, wishX + 18, wishY + 58, wishW - 36, 24, 3);
+  const bioLine = data.giftRecipient.bio
+    ? `Đôi nét: ${data.giftRecipient.bio} — Tự do chọn món quà bất ngờ dưới 200.000đ nhé!`
+    : "Mọi người tự do chọn một món quà bất ngờ, thú vị hoặc thiết thực trong khoảng giá trị dưới 200.000đ dành tặng đồng nghiệp nhé!";
+  wrapText(bioLine, noteX + 18, noteY + 56, noteW - 36, 23, 3);
 
   // 5. SECTION 2: 3 HINTS ABOUT YOUR SANTA
   const sec2X = 54;

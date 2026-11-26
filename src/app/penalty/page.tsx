@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { ArrowLeft, RefreshCw, AlertTriangle, Plus, Trash2 } from "lucide-react";
@@ -44,7 +44,7 @@ export default function PenaltyPage() {
   }, []);
 
   // Draw the wheel on canvas
-  const drawWheel = (angle: number) => {
+  const drawWheel = useCallback((angle: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -109,11 +109,11 @@ export default function PenaltyPage() {
     ctx.font = "bold 18px system-ui";
     ctx.textAlign = "center";
     ctx.fillText("🎁", cx, cy + 6);
-  };
+  }, [penalties]);
 
   useEffect(() => {
     drawWheel(currentAngleRef.current);
-  }, [penalties]);
+  }, [drawWheel]);
 
   const spin = () => {
     if (isSpinning || penalties.length === 0) return;
@@ -143,9 +143,11 @@ export default function PenaltyPage() {
         requestAnimationFrame(animate);
       } else {
         setIsSpinning(false);
-        const normalized = (current % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+        const normalized = ((current % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
         const arc = (2 * Math.PI) / penalties.length;
-        const winningIndex = (penalties.length - Math.floor(normalized / arc)) % penalties.length;
+        // Pointer is fixed at angle 0 (right side); find which slice spans angle 0
+        const pointerAngle = (2 * Math.PI - normalized) % (2 * Math.PI);
+        const winningIndex = Math.floor(pointerAngle / arc) % penalties.length;
         const winner = penalties[winningIndex];
         setSelectedPenalty(winner);
 

@@ -63,7 +63,7 @@ export default function RulesSection({ customRules }: RulesSectionProps) {
                     <Gift className="w-4 h-4 text-red-600" /> Ngân Sách Quà Tặng
                   </h3>
                   <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                    Giá trị món quà từ <strong>100.000đ – 250.000đ</strong>. Khuyến khích tham khảo mục <em>Wishlist</em> của người nhận để chọn quà đúng gu nhé.
+                    Giá trị món quà trong khoảng <strong>dưới 200.000đ</strong>. Mọi người tự do sáng tạo, chọn món quà bất ngờ và ý nghĩa dành tặng người nhận nhé!
                   </p>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import confetti from "canvas-confetti";
 import { ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 
@@ -132,6 +132,15 @@ const WELCOME_FLAKES = Array.from({ length: 16 }, (_, i) => ({
 
 type WelcomeStage = "sealed" | "unsealing" | "letter" | "exiting";
 
+function subscribeWelcomeStorage(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("gs-welcome-storage", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("gs-welcome-storage", callback);
+  };
+}
+
 export default function WelcomeLetter({
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
@@ -140,22 +149,19 @@ export default function WelcomeLetter({
 }: WelcomeLetterProps) {
   const revealDayLabel = formatDayMonth(revealDate, "27/11");
   const eventDayLabel = formatDayMonth(eventDate, "24/12");
-  const [isOpen, setIsOpen] = useState(false);
+  const shouldAutoOpen = useSyncExternalStore(
+    subscribeWelcomeStorage,
+    () => !sessionStorage.getItem("gs_welcome_letter_seen"),
+    () => false
+  );
+  const [forceOpen, setForceOpen] = useState(false);
   const [stage, setStage] = useState<WelcomeStage>("sealed");
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [hasCheckedStorage, setHasCheckedStorage] = useState(false);
 
   useEffect(() => {
-    const seen = sessionStorage.getItem("gs_welcome_letter_seen");
-    if (!seen) {
-      setStage("sealed");
-      setIsOpen(true);
-    }
-    setHasCheckedStorage(true);
-
     const handleReopen = () => {
       setStage("sealed");
-      setIsOpen(true);
+      setForceOpen(true);
     };
     window.addEventListener("reopen-welcome-letter", handleReopen);
     return () => window.removeEventListener("reopen-welcome-letter", handleReopen);
@@ -186,18 +192,20 @@ export default function WelcomeLetter({
 
     setTimeout(() => {
       sessionStorage.setItem("gs_welcome_letter_seen", "true");
-      setIsOpen(false);
+      window.dispatchEvent(new Event("gs-welcome-storage"));
+      setForceOpen(false);
       setStage("sealed");
     }, 450);
   };
 
   const handleSkip = () => {
     sessionStorage.setItem("gs_welcome_letter_seen", "true");
-    setIsOpen(false);
+    window.dispatchEvent(new Event("gs-welcome-storage"));
+    setForceOpen(false);
     setStage("sealed");
   };
 
-  if (!hasCheckedStorage || !isOpen) {
+  if (!shouldAutoOpen && !forceOpen) {
     return null;
   }
 

@@ -19,7 +19,7 @@ interface LocalData {
 const DEFAULT_SETTINGS: ISettings = {
   rules: `### 🎄 THỂ LỆ CUỘC CHƠI SECRET SANTA 🎁
 1. **Bí mật tuyệt đối**: Không được tiết lộ người mình sẽ tặng quà cho bất kỳ ai cho đến ngày trao quà!
-2. **Giá trị món quà**: Món quà nên nằm trong khoảng **100.000đ - 250.000đ**, ý nghĩa và chân thành là chính.
+2. **Giá trị món quà**: Món quà nằm trong khoảng giá trị **dưới 200.000đ**, mọi người tự do chọn quà bất ngờ — ý nghĩa và chân thành là chính!
 3. **Hình thức quà**: Quà phải được gói kín, ghi rõ **Họ tên & Bộ phận người nhận** (nhưng ký tên người tặng là *Secret Santa* 🎅).
 4. **Thời hạn nộp quà**: Tất cả món quà phải được chuyển đến cây thông Noel công ty trước ngày diễn ra sự kiện.
 5. **Thăm hình phạt**: Ai không chuẩn bị quà đúng hạn hoặc đoán sai danh tính Santa của mình tại buổi tiệc sẽ phải quay **Vòng Quay Hình Phạt**! 🎉`,
@@ -78,35 +78,85 @@ function writeLocalData(data: LocalData) {
   }
 }
 
-let isConnected = false;
+const globalForMongoose = globalThis as typeof globalThis & {
+  __santaMongoosePromise?: Promise<typeof mongoose> | null;
+};
+
+function toIsoSafe(val: unknown): string | undefined {
+  if (!val) return undefined;
+  if (val instanceof Date) return val.toISOString();
+  const d = new Date(String(val));
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+}
 
 export async function isMongoAvailable(): Promise<boolean> {
-  const uri = process.env.MONGODB_URI || MONGODB_URI;
+  const uri = (process.env.MONGODB_URI || MONGODB_URI || "").trim();
   if (!uri) return false;
   if (mongoose.connection.readyState === 1) {
-    isConnected = true;
     return true;
   }
   try {
-    await mongoose.connect(uri, {
-      bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
-    });
-    isConnected = true;
-    return true;
+    if (!globalForMongoose.__santaMongoosePromise) {
+      globalForMongoose.__santaMongoosePromise = mongoose.connect(uri, {
+        bufferCommands: false,
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+      });
+    }
+    await globalForMongoose.__santaMongoosePromise;
+    return Number(mongoose.connection.readyState) === 1;
   } catch (err) {
     console.warn("MongoDB connection failed, falling back to local JSON store:", err);
-    isConnected = false;
+    globalForMongoose.__santaMongoosePromise = null;
     return false;
   }
 }
 
 // ---------------- USER OPERATIONS ----------------
+interface LeanUser {
+  _id: { toString(): string };
+  name: string;
+  email: string;
+  phoneLast4: string;
+  department: string;
+  avatar?: string;
+  bio?: string;
+  wishlist?: string;
+  questions?: { question: string; answer: string }[];
+  hasViewed?: boolean;
+  viewedAt?: Date | string;
+  createdAt?: Date | string;
+}
+
+interface LeanMatch {
+  _id: { toString(): string };
+  santaId: string;
+  santaName: string;
+  santaEmail: string;
+  santaDepartment: string;
+  recipientId: string;
+  recipientName: string;
+  recipientEmail: string;
+  recipientDepartment: string;
+  hints?: string[];
+  matchedAt?: Date | string;
+}
+
+interface LeanSettings {
+  rules?: string;
+  eventDate?: string;
+  revealDate?: string;
+  companyDomain?: string;
+  companyName?: string;
+  companyLogo?: string;
+  penalties?: string[];
+}
+
 export async function getUsers(): Promise<IUser[]> {
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    const docs = await UserModel.find().sort({ createdAt: -1 }).lean();
-    return docs.map((doc: any) => ({
+    const docs = await UserModel.find().sort({ createdAt: -1 }).lean<LeanUser[]>();
+    return docs.map((doc) => ({
       id: doc._id.toString(),
       name: doc.name,
       email: doc.email,
@@ -117,8 +167,8 @@ export async function getUsers(): Promise<IUser[]> {
       wishlist: doc.wishlist || "",
       questions: doc.questions || [],
       hasViewed: doc.hasViewed || false,
-      viewedAt: doc.viewedAt ? doc.viewedAt.toISOString() : undefined,
-      createdAt: doc.createdAt ? doc.createdAt.toISOString() : undefined,
+      viewedAt: toIsoSafe(doc.viewedAt),
+      createdAt: toIsoSafe(doc.createdAt),
     }));
   }
   return readLocalData().users;
@@ -128,7 +178,7 @@ export async function getUserByEmail(email: string): Promise<IUser | null> {
   const cleanEmail = email.toLowerCase().trim();
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    const doc: any = await UserModel.findOne({ email: cleanEmail }).lean();
+    const doc = await UserModel.findOne({ email: cleanEmail }).lean<LeanUser | null>();
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -141,8 +191,8 @@ export async function getUserByEmail(email: string): Promise<IUser | null> {
       wishlist: doc.wishlist || "",
       questions: doc.questions || [],
       hasViewed: doc.hasViewed || false,
-      viewedAt: doc.viewedAt ? doc.viewedAt.toISOString() : undefined,
-      createdAt: doc.createdAt ? doc.createdAt.toISOString() : undefined,
+      viewedAt: toIsoSafe(doc.viewedAt),
+      createdAt: toIsoSafe(doc.createdAt),
     };
   }
   const users = readLocalData().users;
@@ -169,28 +219,39 @@ export async function markUserViewed(email: string): Promise<void> {
 }
 
 export async function bulkSaveUsers(users: IUser[]): Promise<void> {
+  if (users.length === 0) return;
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    for (const u of users) {
-      await UserModel.findOneAndUpdate(
-        { email: u.email.toLowerCase().trim() },
-        {
-          name: u.name,
-          email: u.email.toLowerCase().trim(),
-          phoneLast4: u.phoneLast4,
-          department: u.department,
-          avatar: u.avatar || "",
-          bio: u.bio || "",
-          wishlist: u.wishlist || "",
-          questions: u.questions || [],
-        },
-        { upsert: true, new: true }
-      );
-    }
+    // Single bulkWrite round-trip instead of N sequential queries (prevents Vercel 10s timeout)
+    await UserModel.bulkWrite(
+      users.map((u) => {
+        const cleanEmail = u.email.toLowerCase().trim();
+        return {
+          updateOne: {
+            filter: { email: cleanEmail },
+            update: {
+              $set: {
+                name: u.name,
+                email: cleanEmail,
+                phoneLast4: u.phoneLast4,
+                department: u.department,
+                avatar: u.avatar || "",
+                bio: u.bio || "",
+                wishlist: u.wishlist || "",
+                questions: u.questions || [],
+              },
+              $setOnInsert: {
+                hasViewed: false,
+              },
+            },
+            upsert: true,
+          },
+        };
+      })
+    );
     return;
   }
   const data = readLocalData();
-  // Upsert
   for (const nu of users) {
     const idx = data.users.findIndex(
       (u) => u.email.toLowerCase().trim() === nu.email.toLowerCase().trim()
@@ -225,8 +286,8 @@ export async function clearUsers(): Promise<void> {
 export async function getMatches(): Promise<IMatch[]> {
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    const docs = await MatchModel.find().lean();
-    return docs.map((doc: any) => ({
+    const docs = await MatchModel.find().lean<LeanMatch[]>();
+    return docs.map((doc) => ({
       id: doc._id.toString(),
       santaId: doc.santaId,
       santaName: doc.santaName,
@@ -237,7 +298,7 @@ export async function getMatches(): Promise<IMatch[]> {
       recipientEmail: doc.recipientEmail,
       recipientDepartment: doc.recipientDepartment,
       hints: doc.hints || [],
-      matchedAt: doc.matchedAt ? doc.matchedAt.toISOString() : new Date().toISOString(),
+      matchedAt: toIsoSafe(doc.matchedAt) || new Date().toISOString(),
     }));
   }
   return readLocalData().matches;
@@ -247,7 +308,7 @@ export async function getMatchForSanta(santaEmail: string): Promise<IMatch | nul
   const cleanEmail = santaEmail.toLowerCase().trim();
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    const doc: any = await MatchModel.findOne({ santaEmail: cleanEmail }).lean();
+    const doc = await MatchModel.findOne({ santaEmail: cleanEmail }).lean<LeanMatch | null>();
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -260,7 +321,7 @@ export async function getMatchForSanta(santaEmail: string): Promise<IMatch | nul
       recipientEmail: doc.recipientEmail,
       recipientDepartment: doc.recipientDepartment,
       hints: doc.hints || [],
-      matchedAt: doc.matchedAt ? doc.matchedAt.toISOString() : new Date().toISOString(),
+      matchedAt: toIsoSafe(doc.matchedAt) || new Date().toISOString(),
     };
   }
   const matches = readLocalData().matches;
@@ -271,7 +332,7 @@ export async function getMatchForRecipient(recipientEmail: string): Promise<IMat
   const cleanEmail = recipientEmail.toLowerCase().trim();
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    const doc: any = await MatchModel.findOne({ recipientEmail: cleanEmail }).lean();
+    const doc = await MatchModel.findOne({ recipientEmail: cleanEmail }).lean<LeanMatch | null>();
     if (!doc) return null;
     return {
       id: doc._id.toString(),
@@ -284,7 +345,7 @@ export async function getMatchForRecipient(recipientEmail: string): Promise<IMat
       recipientEmail: doc.recipientEmail,
       recipientDepartment: doc.recipientDepartment,
       hints: doc.hints || [],
-      matchedAt: doc.matchedAt ? doc.matchedAt.toISOString() : new Date().toISOString(),
+      matchedAt: toIsoSafe(doc.matchedAt) || new Date().toISOString(),
     };
   }
   const matches = readLocalData().matches;
@@ -333,18 +394,19 @@ export async function clearMatches(): Promise<void> {
 export async function getSettings(): Promise<ISettings> {
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    let doc: any = await SettingsModel.findOne({ key: "global" }).lean();
-    if (!doc) {
-      doc = await SettingsModel.create({ key: "global", ...DEFAULT_SETTINGS });
-    }
+    const doc = await SettingsModel.findOneAndUpdate(
+      { key: "global" },
+      { $setOnInsert: { key: "global", ...DEFAULT_SETTINGS } },
+      { upsert: true, new: true }
+    ).lean<LeanSettings | null>();
     return {
-      rules: doc.rules || DEFAULT_SETTINGS.rules,
-      eventDate: doc.eventDate || DEFAULT_SETTINGS.eventDate,
-      revealDate: doc.revealDate || DEFAULT_SETTINGS.revealDate,
-      companyDomain: doc.companyDomain || "",
-      companyName: doc.companyName || DEFAULT_SETTINGS.companyName,
-      companyLogo: doc.companyLogo ?? DEFAULT_SETTINGS.companyLogo,
-      penalties: doc.penalties && doc.penalties.length > 0 ? doc.penalties : DEFAULT_SETTINGS.penalties,
+      rules: doc?.rules || DEFAULT_SETTINGS.rules,
+      eventDate: doc?.eventDate || DEFAULT_SETTINGS.eventDate,
+      revealDate: doc?.revealDate || DEFAULT_SETTINGS.revealDate,
+      companyDomain: doc?.companyDomain || "",
+      companyName: doc?.companyName || DEFAULT_SETTINGS.companyName,
+      companyLogo: doc?.companyLogo ?? DEFAULT_SETTINGS.companyLogo,
+      penalties: doc?.penalties && doc.penalties.length > 0 ? doc.penalties : DEFAULT_SETTINGS.penalties,
     };
   }
   const data = readLocalData();
@@ -357,19 +419,19 @@ export async function getSettings(): Promise<ISettings> {
 export async function updateSettings(partial: Partial<ISettings>): Promise<ISettings> {
   const useMongo = await isMongoAvailable();
   if (useMongo) {
-    const updated: any = await SettingsModel.findOneAndUpdate(
+    const updated = await SettingsModel.findOneAndUpdate(
       { key: "global" },
       { $set: partial },
       { upsert: true, new: true }
-    ).lean();
+    ).lean<LeanSettings | null>();
     return {
-      rules: updated.rules,
-      eventDate: updated.eventDate,
-      revealDate: updated.revealDate,
-      companyDomain: updated.companyDomain || "",
-      companyName: updated.companyName || DEFAULT_SETTINGS.companyName,
-      companyLogo: updated.companyLogo ?? DEFAULT_SETTINGS.companyLogo,
-      penalties: updated.penalties || DEFAULT_SETTINGS.penalties,
+      rules: updated?.rules || DEFAULT_SETTINGS.rules,
+      eventDate: updated?.eventDate || DEFAULT_SETTINGS.eventDate,
+      revealDate: updated?.revealDate || DEFAULT_SETTINGS.revealDate,
+      companyDomain: updated?.companyDomain || "",
+      companyName: updated?.companyName || DEFAULT_SETTINGS.companyName,
+      companyLogo: updated?.companyLogo ?? DEFAULT_SETTINGS.companyLogo,
+      penalties: updated?.penalties || DEFAULT_SETTINGS.penalties,
     };
   }
   const data = readLocalData();

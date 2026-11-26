@@ -1,22 +1,49 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Shield, Lock, Users, Shuffle, RefreshCw, Download, Upload, Trash2, CheckCircle2, Clock, AlertCircle, Database, ArrowLeft, Sparkles, FileSpreadsheet, Save, HelpCircle } from "lucide-react";
+import { Lock, Users, Shuffle, RefreshCw, Download, Upload, Trash2, CheckCircle2, AlertCircle, Database, ArrowLeft, Sparkles, FileSpreadsheet, Save } from "lucide-react";
 import { IUser, IMatch, ISettings } from "@/lib/types";
 import { downloadSampleTemplate, exportMasterExcel, parseUsersFromExcelBuffer } from "@/lib/excelHelper";
 
+interface AdminStats {
+  totalUsers: number;
+  totalMatched: number;
+  viewedCount: number;
+}
+
+interface AdminDashboardPayload {
+  success: boolean;
+  users?: IUser[];
+  matches?: IMatch[];
+  settings?: ISettings;
+  isMongo?: boolean;
+  stats?: AdminStats;
+  message?: string;
+}
+
+const toDateTimeLocal = (val?: string, fallback = "2026-11-27T00:00") => {
+  if (!val) return fallback;
+  const m = val.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
+  return m ? m[1] : fallback;
+};
+
+const toIsoSeconds = (val: string) => {
+  if (!val) return "";
+  return val.length === 16 ? `${val}:00` : val;
+};
+
 export default function AdminPage() {
   const [token, setToken] = useState<string>("");
+  const tokenRef = useRef<string>("");
   const [passwordInput, setPasswordInput] = useState<string>("");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
   const [users, setUsers] = useState<IUser[]>([]);
   const [matches, setMatches] = useState<IMatch[]>([]);
-  const [settings, setSettings] = useState<ISettings | null>(null);
   const [isMongo, setIsMongo] = useState<boolean>(false);
-  const [stats, setStats] = useState<any>({ totalUsers: 0, totalMatched: 0, viewedCount: 0 });
+  const [stats, setStats] = useState<AdminStats>({ totalUsers: 0, totalMatched: 0, viewedCount: 0 });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -28,77 +55,114 @@ export default function AdminPage() {
   const [companyNameDraft, setCompanyNameDraft] = useState<string>("");
   const [companyLogoDraft, setCompanyLogoDraft] = useState<string>("");
 
-  const toDateTimeLocal = (val?: string, fallback = "2026-11-27T00:00") => {
-    if (!val) return fallback;
-    const m = val.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
-    return m ? m[1] : fallback;
-  };
-
-  const toIsoSeconds = (val: string) => {
-    if (!val) return "";
-    return val.length === 16 ? `${val}:00` : val;
-  };
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check stored token on mount
-  useEffect(() => {
-    const saved = sessionStorage.getItem("admin_token");
-    if (saved) {
-      setToken(saved);
-      fetchDashboard(saved);
+  const getAuthHeaders = useCallback((authToken?: string, isJson = false): HeadersInit => {
+    const headers: Record<string, string> = {};
+    if (isJson) headers["Content-Type"] = "application/json";
+    const resolved = authToken ?? tokenRef.current;
+    if (resolved) headers["Authorization"] = `Bearer ${resolved}`;
+    return headers;
+  }, []);
+
+  const applyDashboardData = useCallback((data: AdminDashboardPayload) => {
+    setIsAuthenticated(true);
+    setUsers(data.users || []);
+    setMatches(data.matches || []);
+    setIsMongo(Boolean(data.isMongo));
+    setStats(data.stats || { totalUsers: 0, totalMatched: 0, viewedCount: 0 });
+    if (data.settings) {
+      setRulesDraft(data.settings.rules || "");
+      setRevealDateDraft(toDateTimeLocal(data.settings.revealDate, "2026-11-27T00:00"));
+      setEventDateDraft(toDateTimeLocal(data.settings.eventDate, "2026-12-24T18:00"));
+      setCompanyNameDraft(data.settings.companyName || "GLOBAL SAFE");
+      setCompanyLogoDraft(data.settings.companyLogo || "/assets/logo.png");
     }
   }, []);
+
+  const fetchDashboard = useCallback(async (authToken?: string, silentOn401 = false) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/data", {
+        headers: getAuthHeaders(authToken),
+        credentials: "include",
+        cache: "no-store",
+      });
+      const data = (await res.json().catch(() => null)) as AdminDashboardPayload | null;
+      if (res.ok && data?.success) {
+        applyDashboardData(data);
+      } else if (res.status === 401) {
+        sessionStorage.removeItem("admin_token");
+        tokenRef.current = "";
+        setToken("");
+        setIsAuthenticated(false);
+        if (!silentOn401) {
+          setAuthError(data?.message || "Phiên đăng nhập không hợp lệ hoặc đã hết hạn.");
+        }
+      } else {
+        setMessage({
+          type: "error",
+          text: data?.message || `Không thể tải dữ liệu (HTTP ${res.status}). Hãy bấm nút làm mới ↻ ở góc bảng.`,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      if (!silentOn401) {
+        setMessage({ type: "error", text: "Lỗi kết nối máy chủ khi tải dữ liệu." });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyDashboardData, getAuthHeaders]);
+
+  // Check stored token or HttpOnly session cookie on mount (all setState calls happen async inside promise callback)
+  useEffect(() => {
+    const saved = sessionStorage.getItem("admin_token") || "";
+    tokenRef.current = saved;
+    void fetch("/api/admin/data", {
+      headers: saved ? { Authorization: `Bearer ${saved}` } : undefined,
+      credentials: "include",
+      cache: "no-store",
+    })
+      .then(async (res) => {
+        const data = (await res.json().catch(() => null)) as AdminDashboardPayload | null;
+        if (res.ok && data?.success) {
+          setToken(saved);
+          applyDashboardData(data);
+        } else if (res.status === 401) {
+          sessionStorage.removeItem("admin_token");
+          tokenRef.current = "";
+          setToken("");
+          setIsAuthenticated(false);
+        }
+      })
+      .catch(() => {});
+  }, [applyDashboardData]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setIsLoading(true);
     try {
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        cache: "no-store",
         body: JSON.stringify({ password: passwordInput }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        tokenRef.current = data.token;
         setToken(data.token);
         sessionStorage.setItem("admin_token", data.token);
         setIsAuthenticated(true);
-        fetchDashboard(data.token);
+        await fetchDashboard(data.token, false);
       } else {
         setAuthError(data.message || "Mật khẩu Admin không đúng.");
       }
-    } catch (err) {
+    } catch {
       setAuthError("Lỗi kết nối máy chủ.");
-    }
-  };
-
-  const fetchDashboard = async (authToken = token) => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/data", {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setIsAuthenticated(true);
-        setUsers(data.users || []);
-        setMatches(data.matches || []);
-        setSettings(data.settings);
-        setIsMongo(data.isMongo);
-        setStats(data.stats || {});
-        if (data.settings) {
-          setRulesDraft(data.settings.rules || "");
-          setRevealDateDraft(toDateTimeLocal(data.settings.revealDate, "2026-11-27T00:00"));
-          setEventDateDraft(toDateTimeLocal(data.settings.eventDate, "2026-12-24T18:00"));
-          setCompanyNameDraft(data.settings.companyName || "GLOBAL SAFE");
-          setCompanyLogoDraft(data.settings.companyLogo || "/assets/logo.png");
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-    } catch (err) {
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +177,9 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/seed", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -122,7 +188,7 @@ export default function AdminPage() {
       } else {
         setMessage({ type: "error", text: data.message || "Lỗi nạp data mẫu." });
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Lỗi kết nối máy chủ." });
     } finally {
       setIsLoading(false);
@@ -144,7 +210,9 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/match", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -157,7 +225,7 @@ export default function AdminPage() {
       } else {
         setMessage({ type: "error", text: data.message || "Lỗi ghép cặp." });
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Lỗi kết nối máy chủ." });
     } finally {
       setIsLoading(false);
@@ -171,14 +239,16 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/match", {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setMessage({ type: "success", text: data.message });
         fetchDashboard();
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Lỗi kết nối máy chủ." });
     } finally {
       setIsLoading(false);
@@ -192,14 +262,16 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/users", {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setMessage({ type: "success", text: data.message });
         fetchDashboard();
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Lỗi kết nối máy chủ." });
     } finally {
       setIsLoading(false);
@@ -239,10 +311,9 @@ export default function AdminPage() {
         setIsLoading(true);
         const res = await fetch("/api/admin/users", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers: getAuthHeaders(token, true),
+          credentials: "include",
+          cache: "no-store",
           body: JSON.stringify(parsedUsers),
         });
 
@@ -270,10 +341,9 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: getAuthHeaders(token, true),
+        credentials: "include",
+        cache: "no-store",
         body: JSON.stringify({
           rules: rulesDraft,
           revealDate: toIsoSeconds(revealDateDraft),
@@ -287,7 +357,7 @@ export default function AdminPage() {
         setMessage({ type: "success", text: "Đã lưu cài đặt thể lệ & thời gian!" });
         fetchDashboard();
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Lỗi kết nối máy chủ." });
     } finally {
       setIsLoading(false);
@@ -374,11 +444,14 @@ export default function AdminPage() {
             </span>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 sessionStorage.removeItem("admin_token");
+                tokenRef.current = "";
+                setToken("");
                 setIsAuthenticated(false);
+                await fetch("/api/admin/auth", { method: "DELETE", credentials: "include" }).catch(() => {});
               }}
-              className="text-xs py-1.5 px-3 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-xl font-bold transition"
+              className="text-xs py-1.5 px-3 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-xl font-bold transition cursor-pointer"
             >
               Đăng xuất
             </button>
