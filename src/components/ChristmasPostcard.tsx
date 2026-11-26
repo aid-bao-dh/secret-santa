@@ -110,13 +110,13 @@ export default function ChristmasPostcard({
             {/* ========================================================================= */}
             <div className="md:col-span-7 flex flex-col justify-between space-y-5">
               <div>
-                {/* Vintage Cursive "Merry Christmas" Heading */}
+                {/* Header Title */}
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h1 className="font-script font-bold text-4xl sm:text-6xl text-[#1e3a8a] drop-shadow-xs leading-none tracking-wide">
-                      Merry Christmas
+                    <h1 className="font-black text-3xl sm:text-5xl text-[#1e3a8a] drop-shadow-xs tracking-tight uppercase">
+                      Merry Christmas ❄️
                     </h1>
-                    <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-red-100/80 border border-red-300 text-red-800 text-xs font-extrabold uppercase tracking-wider">
+                    <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-red-100/90 border border-red-300 text-red-800 text-xs font-black uppercase tracking-wider">
                       <span>🎄</span>
                       <span>Secret Santa • {companyName} 2026</span>
                     </div>

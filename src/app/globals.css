@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-jakarta), var(--font-nunito), system-ui, -apple-system, sans-serif;
+  --font-holiday: var(--font-jakarta), var(--font-nunito), system-ui, -apple-system, sans-serif;
+}
+
 :root {
-  --font-holiday: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
-  --font-sans: var(--font-nunito), var(--font-jakarta), system-ui, -apple-system, sans-serif;
-  --font-script: var(--font-dancing), 'Dancing Script', cursive;
+  --font-sans: var(--font-jakarta), var(--font-nunito), system-ui, -apple-system, sans-serif;
+  --font-holiday: var(--font-jakarta), var(--font-nunito), system-ui, -apple-system, sans-serif;
 }
 
 body {
@@ -22,10 +26,6 @@ body {
 
 .font-holiday {
   font-family: var(--font-holiday);
-}
-
-.font-script {
-  font-family: var(--font-script);
 }
 
 /* Snowflake animation with gentle wind drift */
