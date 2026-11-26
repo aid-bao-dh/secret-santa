@@ -262,12 +262,12 @@ export default function ChristmasPostcard({
                   </div>
                 </div>
 
-                {/* From line (Clean, bold & full width for company name) */}
-                <div className="mb-4 sm:mb-5 pb-3 border-b-2 border-stone-300 flex items-baseline gap-2.5 sm:gap-3">
-                  <span className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
+                {/* From line (Clean, fitted on one line without breaking) */}
+                <div className="mb-4 sm:mb-5 pb-2.5 sm:pb-3 border-b-2 border-stone-300 flex items-baseline gap-2 sm:gap-2.5">
+                  <span className="font-bold text-lg sm:text-xl text-stone-600 shrink-0 italic">
                     from:
                   </span>
-                  <span className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 uppercase tracking-wider drop-shadow-xs">
+                  <span className="font-black text-lg sm:text-xl md:text-2xl text-red-700 uppercase tracking-wider drop-shadow-xs whitespace-nowrap">
                     {companyName}
                   </span>
                 </div>
