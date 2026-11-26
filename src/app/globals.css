@@ -377,3 +377,63 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #ef4444;
 }
+
+/* Dramatic Emergency Red Siren & Alarm Strobe for Top Secret Warning Modal */
+@keyframes alarmStrobe {
+  0%, 100% {
+    background-color: rgba(10, 2, 2, 0.94);
+    box-shadow: inset 0 0 90px rgba(185, 28, 28, 0.35);
+  }
+  50% {
+    background-color: rgba(58, 4, 4, 0.96);
+    box-shadow: inset 0 0 220px rgba(239, 68, 68, 0.8), inset 0 0 60px rgba(255, 20, 20, 0.55);
+  }
+}
+
+@keyframes sirenFlash {
+  0%, 100% {
+    opacity: 0.25;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+@keyframes sirenRotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes warningBoxGlow {
+  0%, 100% {
+    border-color: rgba(220, 38, 38, 0.75);
+    box-shadow: 0 0 35px rgba(220, 38, 38, 0.5), inset 0 0 15px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    border-color: rgba(255, 68, 68, 1);
+    box-shadow: 0 0 85px rgba(239, 68, 68, 0.95), 0 0 30px rgba(255, 20, 20, 0.75), inset 0 0 30px rgba(239, 68, 68, 0.35);
+  }
+}
+
+.animate-alarm-strobe {
+  animation: alarmStrobe 1.4s ease-in-out infinite;
+}
+
+.animate-siren-flash {
+  animation: sirenFlash 1.4s ease-in-out infinite;
+}
+
+.animate-siren-rotate {
+  animation: sirenRotate 5s linear infinite;
+}
+
+.animate-warning-box {
+  animation: warningBoxGlow 1.4s ease-in-out infinite;
+}
+

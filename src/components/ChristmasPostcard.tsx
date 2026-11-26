@@ -313,10 +313,10 @@ export default function ChristmasPostcard({
                       <div className="pt-2">
                         <button
                           onClick={onClose}
-                          className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2"
+                          className="btn-shimmer group w-full py-3.5 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-xs min-[360px]:text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
                         >
                           <span>QUAY LẠI MỞ HỘP QUÀ &amp; ĐẾM NGƯỢC 🎁</span>
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:translate-x-1.5 transition-transform" />
                         </button>
                       </div>
                     )}
@@ -388,7 +388,7 @@ export default function ChristmasPostcard({
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2"
+                        className="btn-shimmer group w-full py-3.5 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-xs min-[360px]:text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
                       >
                         {isLoading ? (
                           <>
@@ -398,7 +398,7 @@ export default function ChristmasPostcard({
                         ) : (
                           <>
                             <span>MỞ THƯ &amp; VÀO SỰ KIỆN</span>
-                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:translate-x-1.5 transition-transform" />
                           </>
                         )}
                       </button>
@@ -425,9 +425,21 @@ export default function ChristmasPostcard({
       {/* DRAMATIC TOP SECRET WARNING POPUP (CẢNH BÁO BẢO MẬT & XEM MỘT MÌNH)       */}
       {/* ========================================================================= */}
       {showWarningModal && pendingData && (
-        <div className="fixed inset-0 z-[100] bg-black/92 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 animate-pop-in">
+        <div className="fixed inset-0 z-[100] animate-alarm-strobe backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          {/* Ambient Emergency Red Siren Sweeps & Strobe in Background */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {/* Center Pulsating Red Beacon Light */}
+            <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] sm:w-[950px] sm:h-[950px] rounded-full bg-[radial-gradient(circle,rgba(239,68,68,0.55)_0%,rgba(185,28,28,0.25)_40%,transparent_70%)] animate-siren-flash" />
+
+            {/* Rotating Tactical Siren Light Beams */}
+            <div className="absolute top-1/2 left-1/2 w-[700px] h-[700px] sm:w-[1100px] sm:h-[1100px] rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(239,68,68,0.35)_45deg,transparent_90deg,transparent_180deg,rgba(239,68,68,0.35)_225deg,transparent_270deg)] animate-siren-rotate" />
+
+            {/* Pulsating Edge Hazard Vignette */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(220,38,38,0.4)_100%)] animate-pulse" />
+          </div>
+
           {/* Dark Stealth Tactical Warning Container */}
-          <div className="relative w-full max-w-lg bg-[#0c0a09] border-2 border-red-600 rounded-3xl shadow-[0_0_80px_rgba(220,38,38,0.65)] overflow-hidden text-stone-100">
+          <div className="relative w-full max-w-lg bg-[#0c0a09] border-2 rounded-3xl animate-warning-box overflow-hidden text-stone-100 z-10 my-auto">
             {/* Top Red-Black Caution Tape Bar */}
             <div
               className="h-3 w-full"
@@ -436,7 +448,7 @@ export default function ChristmasPostcard({
               }}
             />
 
-            <div className="p-5 sm:p-8 space-y-5">
+            <div className="p-4 sm:p-7 md:p-8 space-y-4 sm:space-y-5">
               {/* Top Secret Badge */}
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/90 border border-red-500 text-red-400 text-xs font-black uppercase tracking-widest animate-pulse">
@@ -450,7 +462,7 @@ export default function ChristmasPostcard({
 
               {/* Dangerous Headline */}
               <div className="space-y-1">
-                <h2 className="text-2xl sm:text-3xl font-black text-red-500 uppercase tracking-tight leading-tight flex items-center gap-2">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-red-500 uppercase tracking-tight leading-tight flex items-center gap-2">
                   <span>⚠️</span>
                   <span>BẠN CÓ ĐANG Ở MỘT MÌNH KHÔNG?</span>
                 </h2>
@@ -460,23 +472,23 @@ export default function ChristmasPostcard({
               </div>
 
               {/* Warning Checklist (Dramatic & Fun) */}
-              <div className="space-y-3 bg-red-950/40 border border-red-900/70 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm text-stone-200">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl shrink-0">👀</span>
+              <div className="space-y-2.5 sm:space-y-3 bg-red-950/40 border border-red-900/70 p-3.5 sm:p-5 rounded-2xl text-xs sm:text-sm text-stone-200">
+                <div className="flex items-start gap-2.5 sm:gap-3">
+                  <span className="text-lg sm:text-xl shrink-0">👀</span>
                   <p className="leading-snug">
                     <strong className="text-white font-bold">Quan sát xung quanh ngay bây giờ:</strong> Hãy chắc chắn không có đồng nghiệp nào đang đứng sau lưng hoặc liếc nhìn màn hình của bạn!
                   </p>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <span className="text-xl shrink-0">🤫</span>
+                <div className="flex items-start gap-2.5 sm:gap-3">
+                  <span className="text-lg sm:text-xl shrink-0">🤫</span>
                   <p className="leading-snug">
                     <strong className="text-white font-bold">Nhiệm vụ tối mật:</strong> Sau cánh cửa này là danh tính người bạn sẽ tặng quà và 3 manh mối truy tìm Santa đang âm thầm tặng quà cho bạn.
                   </p>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <span className="text-xl shrink-0">🎪</span>
+                <div className="flex items-start gap-2.5 sm:gap-3">
+                  <span className="text-lg sm:text-xl shrink-0">🎪</span>
                   <p className="leading-snug">
                     <strong className="text-amber-400 font-bold">Hình phạt sinh tử:</strong> Bất kỳ ai vô tình để lộ bí mật trước đêm tiệc Noel 24/12 sẽ bị bêu tên và chịu hình phạt tại <strong className="text-red-400 font-bold">Vòng Quay Phạt</strong> trước toàn thể {companyName}!
                   </p>
@@ -484,14 +496,14 @@ export default function ChristmasPostcard({
               </div>
 
               {/* Interactive Confirm Checkbox */}
-              <label className="flex items-center gap-3 p-3.5 bg-stone-900/90 rounded-2xl border border-stone-800 cursor-pointer select-none hover:border-red-500/60 transition group">
+              <label className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 bg-stone-900/90 rounded-2xl border border-stone-800 cursor-pointer select-none hover:border-red-500/60 transition group">
                 <input
                   type="checkbox"
                   checked={hasConfirmedAlone}
                   onChange={(e) => setHasConfirmedAlone(e.target.checked)}
-                  className="w-5 h-5 rounded accent-red-600 cursor-pointer shrink-0"
+                  className="w-4 h-4 sm:w-5 sm:h-5 rounded accent-red-600 cursor-pointer shrink-0"
                 />
-                <span className="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-white transition">
+                <span className="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-white transition leading-snug">
                   Tôi xác nhận đang ở một mình &amp; thề giữ bí mật tuyệt đối! ✋
                 </span>
               </label>
@@ -501,11 +513,14 @@ export default function ChristmasPostcard({
                 <button
                   type="button"
                   onClick={handleConfirmAndProceed}
-                  className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-[0_0_30px_rgba(220,38,38,0.55)] transition-all hover:scale-[1.01] active:scale-98 border-2 border-red-400 cursor-pointer flex items-center justify-center gap-2"
+                  className="btn-shimmer group w-full py-3.5 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-black rounded-2xl shadow-[0_0_35px_rgba(220,38,38,0.65)] transition-all hover:scale-[1.01] active:scale-98 border-2 border-red-400 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2.5"
                 >
-                  <ShieldAlert className="w-5 h-5" />
-                  <span>TÔI ĐANG Ở MỘT MÌNH — MỞ THƯ NGAY 🔥</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                  <span className="text-xs min-[380px]:text-sm sm:text-base font-black tracking-tight whitespace-nowrap">
+                    <span className="hidden min-[360px]:inline">TÔI ĐANG Ở MỘT MÌNH — </span>
+                    <span>MỞ THƯ NGAY 🔥</span>
+                  </span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:translate-x-1 transition-transform" />
                 </button>
 
                 <button
@@ -514,7 +529,7 @@ export default function ChristmasPostcard({
                     setShowWarningModal(false);
                     setPendingData(null);
                   }}
-                  className="w-full py-2.5 text-center text-xs text-stone-400 hover:text-stone-200 transition font-medium cursor-pointer"
+                  className="w-full py-2 text-center text-xs text-stone-400 hover:text-stone-200 transition font-medium cursor-pointer"
                 >
                   Chờ chút, để tôi tìm góc kín đáo hơn... 🏃‍♂️
                 </button>
