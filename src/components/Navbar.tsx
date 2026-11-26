@@ -86,15 +86,6 @@ export default function Navbar({
             <span className="hidden sm:inline">Thư Mời</span>
           </button>
 
-          <Link
-            href="/penalty"
-            className="flex items-center gap-1 py-1.5 sm:py-2 px-2 sm:px-3.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl transition shadow-xs active:scale-95 shrink-0"
-            title="Vòng quay hình phạt"
-          >
-            <span>🎪</span>
-            <span className="hidden sm:inline">Vòng Quay</span>
-          </Link>
-
           {currentUser && onLogout && (
             <button
               onClick={onLogout}

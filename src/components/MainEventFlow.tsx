@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import Link from "next/link";
 import confetti from "canvas-confetti";
 import { Gift, ArrowRight, ShieldCheck, X } from "lucide-react";
 import SnowEffect from "./SnowEffect";
@@ -109,6 +108,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
     } catch {
       // ignore storage errors
     }
+    setIsModalOpen(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -345,36 +345,10 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
                 data={userData}
                 companyName={companyName}
                 companyLogo={companyLogo}
-                initialStage="card"
+                initialStage="envelope"
                 onClose={() => setIsModalOpen(false)}
               />
             )}
-
-            {/* PENALTY MINI-GAME BANNER */}
-            <section className="max-w-4xl mx-auto px-4 my-8 relative z-20">
-              <RevealOnScroll delay={100}>
-                <div className="bg-white/92 border-2 border-red-500/40 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-md hover:border-red-500/60 transition-colors">
-                  <div className="space-y-2 text-center sm:text-left">
-                    <span className="text-xs px-3 py-1 bg-red-100 text-red-700 border border-red-300 rounded-full font-bold inline-block">
-                      🎪 Tiệc Noel Công Ty
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-black text-red-800 drop-shadow-xs">
-                      Vòng Quay Thăm Hình Phạt 🎡
-                    </h3>
-                    <p className="text-xs sm:text-sm text-stone-600 max-w-md">
-                      Khu vực quay số trừng phạt cho ai quên chuẩn bị quà hoặc đoán sai Santa trong buổi tiệc (do Nhi phụ trách)!
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/penalty"
-                    className="btn-shimmer py-4 px-7 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-red-600/25 transition-all hover:-translate-y-0.5 whitespace-nowrap active:scale-95 border border-red-300"
-                  >
-                    Mở Vòng Quay 🎯
-                  </Link>
-                </div>
-              </RevealOnScroll>
-            </section>
 
             {/* EVENT RULES REFERENCE AT BOTTOM OF EVENT PAGE */}
             <section className="max-w-4xl mx-auto px-4 my-8 relative z-20">
@@ -404,9 +378,6 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
                 💌 Xem lại bưu thiếp
               </button>
             )}
-            <Link href="/penalty" className="hover:text-red-600 transition">
-              Vòng quay hình phạt
-            </Link>
           </div>
         </div>
       </footer>

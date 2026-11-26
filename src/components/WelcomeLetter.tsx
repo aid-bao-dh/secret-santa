@@ -50,6 +50,57 @@ export function playChristmasChime() {
   }
 }
 
+export function playUnsealSound() {
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    // 1. Crisp paper rustle / unsealing tearing sound (filtered noise)
+    const bufferSize = Math.floor(ctx.sampleRate * 0.22);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.08));
+    }
+    const whiteNoise = ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(1600, now);
+    filter.Q.setValueAtTime(2.5, now);
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.28, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    whiteNoise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    whiteNoise.start(now);
+
+    // 2. Celebratory Christmas chime chord right after tearing
+    const chimeNotes = [523.25, 659.25, 783.99, 1046.5];
+    chimeNotes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      const startAt = now + 0.08 + idx * 0.07;
+      osc.frequency.setValueAtTime(freq, startAt);
+      gain.gain.setValueAtTime(0, startAt);
+      gain.gain.linearRampToValueAtTime(0.24, startAt + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.7);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startAt);
+      osc.stop(startAt + 0.75);
+    });
+  } catch (err) {
+    console.warn("Unseal sound error", err);
+  }
+}
+
 export function playJingleBellsMelody() {
   try {
     const AudioCtx =

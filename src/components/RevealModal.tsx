@@ -13,7 +13,7 @@ import {
   Check,
 } from "lucide-react";
 import { generateSecretSantaCard } from "@/lib/generateCardImage";
-import { playJingleBellsMelody, fireGrandConfetti } from "./WelcomeLetter";
+import { fireGrandConfetti, playUnsealSound } from "./WelcomeLetter";
 
 interface RevealModalProps {
   data: {
@@ -80,12 +80,12 @@ export default function RevealModal({
     if (stage !== "envelope") return;
     setStage("unsealing");
 
-    playJingleBellsMelody();
+    playUnsealSound();
     fireGrandConfetti();
 
     setTimeout(() => {
       setStage("card");
-    }, 500);
+    }, 600);
   };
 
   const handleDownload = async () => {
@@ -228,9 +228,9 @@ export default function RevealModal({
 
                       <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-yellow-600 p-1 shadow-[0_12px_30px_rgba(0,0,0,0.4)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                         <div className="w-full h-full rounded-full bg-gradient-to-br from-red-500 via-rose-600 to-red-800 border-2 border-amber-100/85 flex flex-col items-center justify-center text-white shadow-inner">
-                          <span className="text-2xl leading-none">🎁</span>
+                          <span className="text-2xl leading-none">💌</span>
                           <span className="text-[10px] font-black tracking-widest uppercase text-amber-100 mt-1">
-                            MỞ THƯ
+                            BÓC THƯ
                           </span>
                         </div>
                       </div>
@@ -250,7 +250,7 @@ export default function RevealModal({
             </div>
 
             <p className="text-center text-xs sm:text-sm text-amber-100/90 mt-6 font-semibold animate-pulse">
-              👆 Chạm nhẹ vào phong thư để mở quà của bạn nhé
+              👆 Chạm nhẹ vào con dấu sáp để bóc thư bí mật của bạn nhé ✨
             </p>
           </div>
         </div>
@@ -264,7 +264,7 @@ export default function RevealModal({
             if (e.target === e.currentTarget) onClose();
           }}
         >
-          <div className="animate-pop-in relative w-full max-w-lg my-4 bg-white border-2 border-red-500 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden text-stone-900">
+          <div className="animate-letter-unfold relative w-full max-w-lg my-4 bg-white border-2 border-red-500 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden text-stone-900">
             {/* Festive Red Header */}
             <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 p-5 text-center relative shadow-md text-white">
               <button
