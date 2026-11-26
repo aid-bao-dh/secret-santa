@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import { Dancing_Script, Nunito, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+
+const dancingScript = Dancing_Script({
+  variable: "--font-dancing",
+  subsets: ["latin", "vietnamese"],
+  weight: ["600", "700"],
+});
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -27,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="vi"
-      className={`${jakarta.variable} ${nunito.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${nunito.variable} ${dancingScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
