@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock, ShieldAlert } from "lucide-react";
 import { playJingleBellsMelody, fireGrandConfetti, playSuspenseWarningSound } from "./WelcomeLetter";
 import { RevealData } from "./UnboxForm";
+
+const emptySubscribe = () => () => {};
 
 interface ChristmasPostcardProps {
   companyName?: string;
@@ -18,13 +21,7 @@ interface ChristmasPostcardProps {
   onClose?: () => void;
 }
 
-export default function ChristmasPostcard({
-  companyName = "GLOBAL SAFE",
-  customRules,
-  currentUser,
-  onSuccess,
-  onClose,
-}: ChristmasPostcardProps) {
+export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customRules, currentUser, onSuccess, onClose }: ChristmasPostcardProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +29,12 @@ export default function ChristmasPostcard({
   const [pendingData, setPendingData] = useState<RevealData | null>(null);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [hasConfirmedAlone, setHasConfirmedAlone] = useState(false);
+
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,18 +145,14 @@ export default function ChristmasPostcard({
                     <span className="inline-block">📮</span>
                     <span className="animate-gift-hop inline-block">🎁</span>
                   </div>
-                  <p className="text-xs sm:text-[13px] text-stone-700 font-medium leading-snug">
-                    Bức thư mời tham gia hành trình trao gửi niềm vui bất ngờ dành riêng cho bạn!
-                  </p>
+                  <p className="text-xs sm:text-[13px] text-stone-700 font-medium leading-snug">Bức thư mời tham gia hành trình trao gửi niềm vui bất ngờ dành riêng cho bạn!</p>
                 </div>
 
                 {/* Thể Lệ Cuộc Chơi (Rules) */}
                 <div className="mt-4 space-y-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-base">📜</span>
-                    <h3 className="font-bold text-sm sm:text-base text-red-800 uppercase tracking-wide">
-                      Thể Lệ Cuộc Chơi Secret Santa:
-                    </h3>
+                    <h3 className="font-bold text-sm sm:text-base text-red-800 uppercase tracking-wide">Thể Lệ Cuộc Chơi Secret Santa:</h3>
                   </div>
 
                   {customRules ? (
@@ -204,9 +203,7 @@ export default function ChristmasPostcard({
                           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                           <span>Bí Mật Tuyệt Đối</span>
                         </div>
-                        <p className="text-stone-700 leading-snug">
-                          Giữ kín danh tính người nhận và thân phận Santa cho đến đêm tiệc Noel.
-                        </p>
+                        <p className="text-stone-700 leading-snug">Giữ kín danh tính người nhận và thân phận Santa cho đến đêm tiệc Noel.</p>
                       </div>
 
                       {/* Rule 3: Khác phòng ban */}
@@ -215,9 +212,7 @@ export default function ChristmasPostcard({
                           <HeartHandshake className="w-4 h-4 text-emerald-600 shrink-0" />
                           <span>Khác Phòng Ban</span>
                         </div>
-                        <p className="text-stone-700 leading-snug">
-                          Thuật toán tự động ghép đôi khác bộ phận để kết nối tình đồng nghiệp.
-                        </p>
+                        <p className="text-stone-700 leading-snug">Thuật toán tự động ghép đôi khác bộ phận để kết nối tình đồng nghiệp.</p>
                       </div>
 
                       {/* Rule 4: Hình phạt */}
@@ -226,9 +221,7 @@ export default function ChristmasPostcard({
                           <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                           <span>Vòng Quay Phạt</span>
                         </div>
-                        <p className="text-stone-700 leading-snug">
-                          Quên chuẩn bị quà hoặc đoán sai Santa sẽ phải chịu phạt tại tiệc! 🎪
-                        </p>
+                        <p className="text-stone-700 leading-snug">Quên chuẩn bị quà hoặc đoán sai Santa sẽ phải chịu phạt tại tiệc! 🎪</p>
                       </div>
                     </div>
                   )}
@@ -248,28 +241,20 @@ export default function ChristmasPostcard({
               <div>
                 {/* Top: Festive Airmail Postage Stamp */}
                 <div className="flex items-start justify-between mb-4">
-                  <div className="text-xs font-mono uppercase tracking-widest text-stone-400">
-                    AIR MAIL • POSTCARD
-                  </div>
+                  <div className="text-xs font-mono uppercase tracking-widest text-stone-400">AIR MAIL • POSTCARD</div>
 
                   {/* Stamp Card with dashed/perforated border */}
                   <div className="px-3 py-2 bg-amber-50/95 border-2 border-dashed border-red-500/80 rounded-xl text-center shadow-md rotate-2 transition-transform hover:rotate-0">
                     <div className="text-2xl select-none mb-0.5">🦌🎅</div>
-                    <div className="text-[9px] font-black uppercase text-red-700 tracking-wider">
-                      GIÁNG SINH
-                    </div>
+                    <div className="text-[9px] font-black uppercase text-red-700 tracking-wider">GIÁNG SINH</div>
                     <div className="text-[10px] font-bold text-emerald-700">2026 ❄️</div>
                   </div>
                 </div>
 
                 {/* From line (Clean, fitted on one line without breaking) */}
                 <div className="mb-4 sm:mb-5 pb-2.5 sm:pb-3 border-b-2 border-stone-300 flex items-baseline gap-2.5">
-                  <span className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">
-                    from:
-                  </span>
-                  <span className="font-black text-xl sm:text-2xl text-red-700 uppercase tracking-wider drop-shadow-xs whitespace-nowrap">
-                    {companyName}
-                  </span>
+                  <span className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">from:</span>
+                  <span className="font-black text-xl sm:text-2xl text-red-700 uppercase tracking-wider drop-shadow-xs whitespace-nowrap">{companyName}</span>
                 </div>
 
                 {/* If already logged in: Display recipient name BIG and personal */}
@@ -277,18 +262,12 @@ export default function ChristmasPostcard({
                   <div className="space-y-4 my-2 animate-fade-up">
                     <div className="pt-1">
                       <div className="flex items-baseline gap-2.5 mb-1.5">
-                        <span className="font-bold text-xl sm:text-2xl text-stone-800 italic">
-                          to:
-                        </span>
-                        <span className="text-[11px] font-bold text-red-600 uppercase tracking-widest bg-red-100/90 px-2.5 py-0.5 rounded-full border border-red-200">
-                          Người nhận thư 💌
-                        </span>
+                        <span className="font-bold text-xl sm:text-2xl text-stone-800 italic">to:</span>
+                        <span className="text-[11px] font-bold text-red-600 uppercase tracking-widest bg-red-100/90 px-2.5 py-0.5 rounded-full border border-red-200">Người nhận thư 💌</span>
                       </div>
 
                       <div className="pl-3.5 sm:pl-5 border-l-4 sm:border-l-6 border-red-600 bg-gradient-to-r from-red-50/95 via-amber-50/70 to-white/90 py-3.5 px-3.5 sm:px-4 rounded-r-2xl shadow-sm border border-l-0 border-amber-200/60">
-                        <h3 className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 leading-tight tracking-tight drop-shadow-xs break-words">
-                          {currentUser.name}
-                        </h3>
+                        <h3 className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 leading-tight tracking-tight drop-shadow-xs break-words">{currentUser.name}</h3>
                         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2">
                           <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs sm:text-sm font-bold border border-emerald-300 shadow-xs max-w-full">
                             <span>🏢</span>
@@ -332,9 +311,7 @@ export default function ChristmasPostcard({
                         <label htmlFor="postcard-email" className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">
                           to:
                         </label>
-                        <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-                          (Email công ty của bạn)
-                        </span>
+                        <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">(Email công ty của bạn)</span>
                       </div>
 
                       <div className="relative">
@@ -357,9 +334,7 @@ export default function ChristmasPostcard({
                         <label htmlFor="postcard-pass" className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">
                           pass:
                         </label>
-                        <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-                          (4 số cuối điện thoại)
-                        </span>
+                        <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">(4 số cuối điện thoại)</span>
                       </div>
 
                       <div className="relative">
@@ -379,11 +354,7 @@ export default function ChristmasPostcard({
                     </div>
 
                     {/* Error Notification */}
-                    {errorMsg && (
-                      <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">
-                        ⚠️ {errorMsg}
-                      </div>
-                    )}
+                    {errorMsg && <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">⚠️ {errorMsg}</div>}
 
                     {/* Submit Button (Wax seal style / Festive Postcard Stamp Action) */}
                     <div className="pt-3">
@@ -405,9 +376,7 @@ export default function ChristmasPostcard({
                         )}
                       </button>
 
-                      <p className="text-center text-[11px] text-stone-500 mt-2 font-medium">
-                        👆 Nhập thông tin để mở hộp quà và theo dõi đồng hồ đếm ngược!
-                      </p>
+                      <p className="text-center text-[11px] text-stone-500 mt-2 font-medium">👆 Nhập thông tin để mở hộp quà và theo dõi đồng hồ đếm ngược!</p>
                     </div>
                   </form>
                 )}
@@ -426,10 +395,10 @@ export default function ChristmasPostcard({
       {/* ========================================================================= */}
       {/* DRAMATIC TOP SECRET WARNING POPUP (CẢNH BÁO BẢO MẬT & XEM MỘT MÌNH)       */}
       {/* ========================================================================= */}
-      {showWarningModal && pendingData && (
-        <div className="fixed inset-0 z-[100] animate-alarm-strobe backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      {showWarningModal && pendingData && isMounted && createPortal(
+        <div className="fixed inset-0 z-[9999] animate-alarm-strobe backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
           {/* Ambient Emergency Red Siren Sweeps & Strobe in Background */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="fixed inset-0 pointer-events-none overflow-hidden">
             {/* Center Pulsating Red Beacon Light */}
             <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] sm:w-[950px] sm:h-[950px] rounded-full bg-[radial-gradient(circle,rgba(239,68,68,0.55)_0%,rgba(185,28,28,0.25)_40%,transparent_70%)] animate-siren-flash" />
 
@@ -441,25 +410,23 @@ export default function ChristmasPostcard({
           </div>
 
           {/* Dark Stealth Tactical Warning Container */}
-          <div className="relative w-full max-w-lg bg-[#0c0a09] border-2 rounded-3xl animate-warning-box overflow-hidden text-stone-100 z-10 my-auto">
+          <div className="relative w-full max-w-lg bg-[#0c0a09] border-2 rounded-3xl animate-warning-box overflow-hidden text-stone-100 z-10 my-auto shadow-[0_0_80px_rgba(220,38,38,0.7)]">
             {/* Top Red-Black Caution Tape Bar */}
             <div
-              className="h-3 w-full"
+              className="h-3 w-full shrink-0"
               style={{
                 background: "repeating-linear-gradient(-45deg, #dc2626 0px, #dc2626 12px, #000 12px, #000 24px)",
               }}
             />
 
-            <div className="p-4 sm:p-7 md:p-8 space-y-4 sm:space-y-5">
+            <div className="p-4 sm:p-7 md:p-8 space-y-3.5 sm:space-y-5">
               {/* Top Secret Badge */}
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/90 border border-red-500 text-red-400 text-xs font-black uppercase tracking-widest animate-pulse">
                   <span className="text-base">🚨</span>
                   <span>MẬT LỆNH BẢO MẬT CẤP ĐỘ CAO NHẤT</span>
                 </div>
-                <span className="text-xs font-mono text-stone-500 uppercase tracking-widest hidden sm:inline">
-                  TOP SECRET
-                </span>
+                <span className="text-xs font-mono text-stone-500 uppercase tracking-widest hidden sm:inline">TOP SECRET</span>
               </div>
 
               {/* Dangerous Headline */}
@@ -468,9 +435,7 @@ export default function ChristmasPostcard({
                   <span>⚠️</span>
                   <span>BẠN CÓ ĐANG Ở MỘT MÌNH KHÔNG?</span>
                 </h2>
-                <p className="text-xs sm:text-sm text-stone-400 font-medium">
-                  (ARE YOU CURRENTLY VIEWING THIS ALONE?)
-                </p>
+                <p className="text-xs sm:text-sm text-stone-400 font-medium">(ARE YOU CURRENTLY VIEWING THIS ALONE?)</p>
               </div>
 
               {/* Warning Checklist (Dramatic & Fun) */}
@@ -499,15 +464,8 @@ export default function ChristmasPostcard({
 
               {/* Interactive Confirm Checkbox */}
               <label className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 bg-stone-900/90 rounded-2xl border border-stone-800 cursor-pointer select-none hover:border-red-500/60 transition group">
-                <input
-                  type="checkbox"
-                  checked={hasConfirmedAlone}
-                  onChange={(e) => setHasConfirmedAlone(e.target.checked)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 rounded accent-red-600 cursor-pointer shrink-0"
-                />
-                <span className="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-white transition leading-snug">
-                  Tôi xác nhận đang ở một mình &amp; thề giữ bí mật tuyệt đối! ✋
-                </span>
+                <input type="checkbox" checked={hasConfirmedAlone} onChange={(e) => setHasConfirmedAlone(e.target.checked)} className="w-4 h-4 sm:w-5 sm:h-5 rounded accent-red-600 cursor-pointer shrink-0" />
+                <span className="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-white transition leading-snug">Tôi xác nhận đang ở một mình &amp; thề giữ bí mật tuyệt đối! ✋</span>
               </label>
 
               {/* Actions */}
@@ -519,8 +477,7 @@ export default function ChristmasPostcard({
                 >
                   <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                   <span className="text-xs min-[380px]:text-sm sm:text-base font-black tracking-tight whitespace-nowrap">
-                    <span className="hidden min-[360px]:inline">TÔI ĐANG Ở MỘT MÌNH — </span>
-                    <span>MỞ THƯ NGAY 🔥</span>
+                    TÔI ĐANG Ở MỘT MÌNH — MỞ THƯ NGAY 🔥
                   </span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -540,13 +497,14 @@ export default function ChristmasPostcard({
 
             {/* Bottom Red-Black Caution Tape Bar */}
             <div
-              className="h-3 w-full"
+              className="h-3 w-full shrink-0"
               style={{
                 background: "repeating-linear-gradient(-45deg, #dc2626 0px, #dc2626 12px, #000 12px, #000 24px)",
               }}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
