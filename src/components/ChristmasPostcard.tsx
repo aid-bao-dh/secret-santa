@@ -1,0 +1,335 @@
+"use client";
+
+import { useState } from "react";
+import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock } from "lucide-react";
+import { playJingleBellsMelody, fireGrandConfetti } from "./WelcomeLetter";
+import { RevealData } from "./UnboxForm";
+
+interface ChristmasPostcardProps {
+  companyName?: string;
+  companyLogo?: string;
+  customRules?: string;
+  onSuccess: (data: RevealData) => void;
+}
+
+export default function ChristmasPostcard({
+  companyName = "GLOBAL SAFE",
+  companyLogo = "/assets/logo.png",
+  customRules,
+  onSuccess,
+}: ChristmasPostcardProps) {
+  const [email, setEmail] = useState("");
+  const [phoneLast4, setPhoneLast4] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+
+    const cleanEmail = email.trim();
+    const cleanPhone = phoneLast4.trim();
+
+    if (!cleanEmail || !cleanPhone) {
+      setErrorMsg("Vui lòng nhập đầy đủ Email công ty và 4 số cuối điện thoại.");
+      return;
+    }
+
+    if (cleanPhone.length !== 4 || !/^\d{4}$/.test(cleanPhone)) {
+      setErrorMsg("Mã bảo mật phải là đúng 4 chữ số cuối số điện thoại.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/reveal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, phoneLast4: cleanPhone }),
+      });
+
+      const data = await res.json();
+
+      // Suspense delay
+      await new Promise((r) => setTimeout(r, 800));
+
+      if (!res.ok || !data.success) {
+        setErrorMsg(data.message || "Không thể xác thực thông tin. Vui lòng kiểm tra lại!");
+        setIsLoading(false);
+        return;
+      }
+
+      playJingleBellsMelody();
+      fireGrandConfetti();
+
+      onSuccess(data);
+    } catch {
+      setErrorMsg("Có lỗi kết nối đến máy chủ. Vui lòng thử lại sau.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto px-4 py-4 sm:py-8">
+      {/* Outer Airmail Diagonal Striped Border (Matches user's postcard inspiration) */}
+      <div
+        className="relative w-full rounded-[32px] p-3 sm:p-5 shadow-[0_25px_70px_rgba(0,0,0,0.35)] transition-all duration-300"
+        style={{
+          background: `repeating-linear-gradient(
+            -45deg,
+            #dc2626 0px,
+            #dc2626 14px,
+            #fbf7ed 14px,
+            #fbf7ed 22px,
+            #1d4ed8 22px,
+            #1d4ed8 36px,
+            #fbf7ed 36px,
+            #fbf7ed 44px
+          )`,
+        }}
+      >
+        {/* Inner Parchment Card Body */}
+        <div className="relative w-full bg-[#fcf9f2] rounded-[24px] p-6 sm:p-9 shadow-inner border border-amber-900/10 text-stone-800 overflow-hidden">
+          {/* Subtle Vintage Texture Accent */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#78350f_1px,transparent_1px)] [background-size:16px_16px]" />
+
+          {/* Grid Layout: Left (Merry Christmas & Rules) + Right (Stamp, To, From, Login Inputs) */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch relative z-10">
+            {/* ========================================================================= */}
+            {/* LEFT HALF: "Merry Christmas" + Illustrations + Thể Lệ Cuộc Chơi          */}
+            {/* ========================================================================= */}
+            <div className="md:col-span-7 flex flex-col justify-between space-y-5">
+              <div>
+                {/* Vintage Cursive "Merry Christmas" Heading */}
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h1 className="font-holiday font-bold text-4xl sm:text-6xl text-[#1e3a8a] drop-shadow-xs leading-none tracking-wide">
+                      Merry Christmas
+                    </h1>
+                    <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-red-100/80 border border-red-300 text-red-800 text-xs font-extrabold uppercase tracking-wider">
+                      <span>🎄</span>
+                      <span>Secret Santa • {companyName} 2026</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cute Festive Holiday Illustration Cluster (Gnome, Tree, Santa Mailbox) */}
+                <div className="flex items-center gap-4 my-4 p-3 bg-white/80 rounded-2xl border border-amber-200/60 shadow-xs">
+                  <div className="flex items-center gap-2 text-3xl sm:text-4xl select-none">
+                    <span className="animate-sway inline-block">🎅</span>
+                    <span className="animate-float-slow inline-block">🎄</span>
+                    <span className="inline-block">📮</span>
+                    <span className="animate-gift-hop inline-block">🎁</span>
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-stone-700 font-medium leading-snug">
+                    Bức thư mời tham gia hành trình trao gửi niềm vui bất ngờ dành riêng cho bạn!
+                  </p>
+                </div>
+
+                {/* Thể Lệ Cuộc Chơi (Rules) */}
+                <div className="mt-4 space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">📜</span>
+                    <h3 className="font-bold text-sm sm:text-base text-red-800 uppercase tracking-wide">
+                      Thể Lệ Cuộc Chơi Secret Santa:
+                    </h3>
+                  </div>
+
+                  {customRules ? (
+                    <div className="p-3.5 bg-white/90 rounded-2xl border border-stone-200 text-xs sm:text-sm text-stone-700 leading-relaxed whitespace-pre-line">
+                      {customRules}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                      {/* Rule 1: Ngân sách */}
+                      <div className="p-3 bg-red-50/90 rounded-2xl border border-red-200 shadow-xs">
+                        <div className="flex items-center gap-1.5 font-bold text-red-800 mb-0.5">
+                          <Gift className="w-4 h-4 text-red-600 shrink-0" />
+                          <span>Ngân Sách Quà Tặng</span>
+                        </div>
+                        <p className="text-stone-700 leading-snug">
+                          Dưới <strong className="text-red-700 font-bold">200.000đ</strong>. Tự do sáng tạo món quà bất ngờ &amp; ý nghĩa!
+                        </p>
+                      </div>
+
+                      {/* Rule 2: Bí mật */}
+                      <div className="p-3 bg-emerald-50/90 rounded-2xl border border-emerald-200 shadow-xs">
+                        <div className="flex items-center gap-1.5 font-bold text-emerald-800 mb-0.5">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Bí Mật Tuyệt Đối</span>
+                        </div>
+                        <p className="text-stone-700 leading-snug">
+                          Giữ kín danh tính người nhận và thân phận Santa cho đến đêm tiệc Noel.
+                        </p>
+                      </div>
+
+                      {/* Rule 3: Khác phòng ban */}
+                      <div className="p-3 bg-emerald-50/90 rounded-2xl border border-emerald-200 shadow-xs">
+                        <div className="flex items-center gap-1.5 font-bold text-emerald-800 mb-0.5">
+                          <HeartHandshake className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Khác Phòng Ban</span>
+                        </div>
+                        <p className="text-stone-700 leading-snug">
+                          Thuật toán tự động ghép đôi khác bộ phận để kết nối tình đồng nghiệp.
+                        </p>
+                      </div>
+
+                      {/* Rule 4: Hình phạt */}
+                      <div className="p-3 bg-amber-50/90 rounded-2xl border border-amber-200 shadow-xs">
+                        <div className="flex items-center gap-1.5 font-bold text-amber-800 mb-0.5">
+                          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>Vòng Quay Phạt</span>
+                        </div>
+                        <p className="text-stone-700 leading-snug">
+                          Quên chuẩn bị quà hoặc đoán sai Santa sẽ phải chịu phạt tại tiệc! 🎪
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Decorative Touch */}
+              <div className="hidden md:flex items-center gap-2 pt-2 text-[11px] text-stone-500 italic">
+                <span>✦ Mùa lễ hội 2026 • Gắn kết &amp; Yêu thương • {companyName} ✦</span>
+              </div>
+            </div>
+
+            {/* ========================================================================= */}
+            {/* RIGHT HALF: Postage Stamp + To / From Fields + Login Form                 */}
+            {/* ========================================================================= */}
+            <div className="md:col-span-5 md:border-l md:border-dashed md:border-stone-300 md:pl-8 flex flex-col justify-between">
+              <div>
+                {/* Top: Festive Airmail Postage Stamp */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="text-xs font-mono uppercase tracking-widest text-stone-400">
+                    AIR MAIL • POSTCARD
+                  </div>
+
+                  {/* Stamp Card with dashed/perforated border */}
+                  <div className="px-3 py-2 bg-amber-50/95 border-2 border-dashed border-red-500/80 rounded-xl text-center shadow-md rotate-2 transition-transform hover:rotate-0">
+                    <div className="text-2xl select-none mb-0.5">🦌🎅</div>
+                    <div className="text-[9px] font-black uppercase text-red-700 tracking-wider">
+                      GIÁNG SINH
+                    </div>
+                    <div className="text-[10px] font-bold text-emerald-700">2026 ❄️</div>
+                  </div>
+                </div>
+
+                {/* From line */}
+                <div className="mb-5 pb-2 border-b border-stone-300 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-holiday font-bold text-xl sm:text-2xl text-stone-700">
+                      from:
+                    </span>
+                    <span className="font-extrabold text-sm sm:text-base text-red-700 uppercase tracking-wide">
+                      {companyName}
+                    </span>
+                  </div>
+                  {companyLogo && (
+                    <img src={companyLogo} alt={companyName} className="h-5 sm:h-6 w-auto object-contain opacity-85" />
+                  )}
+                </div>
+
+                {/* Postcard Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* To Line (Email công ty) */}
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <label htmlFor="postcard-email" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
+                        to:
+                      </label>
+                      <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        (Email công ty của bạn)
+                      </span>
+                    </div>
+
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
+                      <input
+                        id="postcard-email"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="ten.nguyen@globalsafe.vn"
+                        className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal transition"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Pass Line (4 số cuối điện thoại) */}
+                  <div className="pt-1">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <label htmlFor="postcard-pass" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
+                        pass:
+                      </label>
+                      <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        (4 số cuối điện thoại)
+                      </span>
+                    </div>
+
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
+                      <input
+                        id="postcard-pass"
+                        type="password"
+                        inputMode="numeric"
+                        maxLength={4}
+                        required
+                        value={phoneLast4}
+                        onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, ""))}
+                        placeholder="•••• (4 chữ số)"
+                        className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal tracking-widest transition"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Error Notification */}
+                  {errorMsg && (
+                    <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">
+                      ⚠️ {errorMsg}
+                    </div>
+                  )}
+
+                  {/* Submit Button (Wax seal style / Festive Postcard Stamp Action) */}
+                  <div className="pt-3">
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Gift className="w-5 h-5 animate-spin text-yellow-200" />
+                          <span>Đang bóc tem &amp; mở thư...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>MỞ THƯ &amp; VÀO SỰ KIỆN</span>
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                        </>
+                      )}
+                    </button>
+
+                    <p className="text-center text-[11px] text-stone-500 mt-2 font-medium">
+                      👆 Nhập thông tin để mở hộp quà và theo dõi đồng hồ đếm ngược!
+                    </p>
+                  </div>
+                </form>
+              </div>
+
+              {/* Postcard Postal Watermark */}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400 font-mono">
+                <span>PAR AVION • ĐIỆN TỬ</span>
+                <span>GLOBAL SAFE 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

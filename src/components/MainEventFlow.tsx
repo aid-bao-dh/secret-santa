@@ -3,14 +3,15 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
-import { Gift, ArrowRight, ShieldCheck } from "lucide-react";
+import { Gift, ArrowRight, ShieldCheck, X } from "lucide-react";
 import SnowEffect from "./SnowEffect";
 import FairyLights from "./FairyLights";
 import Navbar from "./Navbar";
 import Countdown from "./Countdown";
 import RulesSection from "./RulesSection";
-import UnboxForm, { RevealData } from "./UnboxForm";
-import WelcomeLetter, { playChristmasChime } from "./WelcomeLetter";
+import ChristmasPostcard from "./ChristmasPostcard";
+import { RevealData } from "./UnboxForm";
+import { playChristmasChime } from "./WelcomeLetter";
 import RevealModal from "./RevealModal";
 import RevealOnScroll from "./RevealOnScroll";
 
@@ -26,7 +27,7 @@ interface MainEventFlowProps {
   settings: Settings;
 }
 
-type FlowStep = "login" | "letter" | "event";
+type FlowStep = "login" | "event";
 
 const emptySubscribe = () => () => {};
 
@@ -51,7 +52,7 @@ function getStoredUser(): RevealData | null {
 function getStoredStep(): FlowStep {
   try {
     const saved = sessionStorage.getItem("ss_flow_step") as FlowStep | null;
-    return saved === "event" || saved === "letter" ? saved : "login";
+    return saved === "event" ? "event" : "login";
   } catch {
     return "login";
   }
@@ -82,7 +83,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isReopeningLetter, setIsReopeningLetter] = useState(false);
+  const [isReopeningPostcard, setIsReopeningPostcard] = useState(false);
 
   const userData = storedUser;
   const step: FlowStep = userData ? storedStep : "login";
@@ -90,15 +91,6 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
   const handleLoginSuccess = (data: RevealData) => {
     try {
       sessionStorage.setItem("ss_user_data", JSON.stringify(data));
-      sessionStorage.setItem("ss_flow_step", "letter");
-      window.dispatchEvent(new Event("ss-session-change"));
-    } catch {
-      // ignore storage errors
-    }
-  };
-
-  const handleProceedToEvent = () => {
-    try {
       sessionStorage.setItem("ss_flow_step", "event");
       window.dispatchEvent(new Event("ss-session-change"));
     } catch {
@@ -116,7 +108,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
       // ignore storage errors
     }
     setIsModalOpen(false);
-    setIsReopeningLetter(false);
+    setIsReopeningPostcard(false);
   };
 
   if (!mounted) {
@@ -134,33 +126,30 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col justify-between">
-      {/* STEP 2: WELCOME INVITATION LETTER OVERLAY */}
-      {step === "letter" && userData && (
-        <WelcomeLetter
-          isOpen={true}
-          companyName={companyName}
-          companyLogo={companyLogo}
-          revealDate={revealDate}
-          eventDate={eventDate}
-          recipientName={userData.currentUser.name}
-          recipientDepartment={userData.currentUser.department}
-          onProceedToEvent={handleProceedToEvent}
-          onClose={handleProceedToEvent}
-        />
-      )}
-
-      {/* REOPENED LETTER OVERLAY (WHEN IN EVENT STEP) */}
-      {isReopeningLetter && (
-        <WelcomeLetter
-          isOpen={true}
-          companyName={companyName}
-          companyLogo={companyLogo}
-          revealDate={revealDate}
-          eventDate={eventDate}
-          recipientName={userData?.currentUser.name}
-          recipientDepartment={userData?.currentUser.department}
-          onClose={() => setIsReopeningLetter(false)}
-        />
+      {/* REOPENED POSTCARD MODAL (WHEN VIEWING FROM EVENT HUB) */}
+      {isReopeningPostcard && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-pop-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsReopeningPostcard(false);
+          }}
+        >
+          <div className="relative w-full max-w-4xl my-auto">
+            <button
+              onClick={() => setIsReopeningPostcard(false)}
+              className="absolute -top-3 -right-2 z-50 p-2.5 rounded-full bg-white text-stone-800 shadow-xl hover:bg-stone-100 transition cursor-pointer border border-stone-200"
+              title="Đóng bưu thiếp"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <ChristmasPostcard
+              companyName={companyName}
+              companyLogo={companyLogo}
+              customRules={settings.rules}
+              onSuccess={() => setIsReopeningPostcard(false)}
+            />
+          </div>
+        </div>
       )}
 
       {/* Clean Static Winter Backdrop */}
@@ -186,7 +175,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
           companyLogo={companyLogo}
           currentUser={step === "event" ? userData?.currentUser : null}
           onLogout={handleLogout}
-          onReopenLetter={() => setIsReopeningLetter(true)}
+          onReopenLetter={() => setIsReopeningPostcard(true)}
         />
 
         {/* Twinkling Christmas Lights Garland */}
@@ -202,63 +191,33 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
         </div>
 
         {/* ========================================================================= */}
-        {/* STEP 1: TRANG ĐẦU TIÊN — ĐĂNG NHẬP CÓ THỂ LỆ                              */}
+        {/* SCREEN 1: BƯU THIẾP GIÁNG SINH (POSTCARD) — GỘP ĐĂNG NHẬP, THỂ LỆ & THƯ MỜI */}
         {/* ========================================================================= */}
         {step === "login" && (
           <div className="animate-fade-up">
-            {/* Header for Login Step */}
-            <header className="pt-8 sm:pt-12 pb-4 text-center px-4 relative z-20 max-w-4xl mx-auto">
-              <span
-                className="hidden lg:block absolute left-2 top-14 text-3xl opacity-70 animate-float-slow select-none pointer-events-none"
-                aria-hidden="true"
-              >
-                🎄
-              </span>
-              <span
-                className="hidden lg:block absolute right-2 top-20 text-3xl opacity-70 animate-float-reverse select-none pointer-events-none"
-                aria-hidden="true"
-              >
-                🔔
-              </span>
-
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-5">
+            {/* Header above postcard */}
+            <header className="pt-6 sm:pt-10 pb-2 text-center px-4 relative z-20 max-w-4xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-3">
                 <span className="text-base">🎄</span>
                 <span>SECRET SANTA • {companyName} 2026</span>
                 <span className="text-base">🎅</span>
               </div>
-
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-500 to-emerald-700 animate-gradient-flow drop-shadow-xs leading-tight mb-3">
-                ĐĂNG NHẬP THAM GIA MÙA LỄ HỘI
-              </h1>
-
-              <p className="text-stone-700 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed font-medium">
-                Chào mừng bạn đến với sự kiện Secret Santa 2026! Vui lòng đọc kỹ thể lệ và đăng nhập để nhận bức thư mời bí mật từ Bắc Cực. ✨💌
-              </p>
             </header>
 
-            {/* Login & Rules Hub: 2-Column Side-by-Side Layout */}
-            <section id="unbox-section" className="max-w-6xl mx-auto px-4 my-6 sm:my-10 relative z-20">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Column 1: Event Rules (7 cols on desktop) */}
-                <div className="lg:col-span-7 w-full order-2 lg:order-1">
-                  <RulesSection customRules={settings.rules} />
-                </div>
-
-                {/* Column 2: Login Form (5 cols on desktop) */}
-                <div className="lg:col-span-5 w-full order-1 lg:order-2">
-                  <UnboxForm
-                    companyName={companyName}
-                    companyLogo={companyLogo}
-                    onSuccess={handleLoginSuccess}
-                  />
-                </div>
-              </div>
+            {/* Christmas Postcard (Vintage Airmail Postcard with rules & To/From login lines) */}
+            <section className="relative z-20">
+              <ChristmasPostcard
+                companyName={companyName}
+                companyLogo={companyLogo}
+                customRules={settings.rules}
+                onSuccess={handleLoginSuccess}
+              />
             </section>
           </div>
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 3: PHẦN MỞ HỘP CÓ THÔNG TIN ĐẾM NGƯỢC (EVENT HUB)                    */}
+        {/* SCREEN 2: PHẦN MỞ HỘP CÓ THÔNG TIN ĐẾM NGƯỢC (EVENT HUB)                  */}
         {/* ========================================================================= */}
         {step === "event" && userData && (
           <div className="animate-fade-up">
@@ -430,10 +389,10 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
           <div className="flex items-center gap-4 font-medium">
             {step === "event" && (
               <button
-                onClick={() => setIsReopeningLetter(true)}
+                onClick={() => setIsReopeningPostcard(true)}
                 className="hover:text-red-600 transition cursor-pointer"
               >
-                💌 Xem lại thư mời
+                💌 Xem lại bưu thiếp
               </button>
             )}
             <Link href="/penalty" className="hover:text-red-600 transition">
