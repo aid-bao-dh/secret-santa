@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --font-holiday: var(--font-dancing), var(--font-nunito), cursive;
+  --font-holiday: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
   --font-sans: var(--font-nunito), var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  --font-script: var(--font-dancing), 'Dancing Script', cursive;
 }
 
 body {
   background-color: #fafaf9;
   color: #1c1917;
-  font-family: var(--font-holiday);
+  font-family: var(--font-sans);
   overflow-x: hidden;
   /* Fresh, bright snowy winter atmosphere with soft holiday warmth */
   background-image: 
@@ -21,6 +22,10 @@ body {
 
 .font-holiday {
   font-family: var(--font-holiday);
+}
+
+.font-script {
+  font-family: var(--font-script);
 }
 
 /* Snowflake animation with gentle wind drift */

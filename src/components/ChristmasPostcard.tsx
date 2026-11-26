@@ -113,7 +113,7 @@ export default function ChristmasPostcard({
                 {/* Vintage Cursive "Merry Christmas" Heading */}
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h1 className="font-holiday font-bold text-4xl sm:text-6xl text-[#1e3a8a] drop-shadow-xs leading-none tracking-wide">
+                    <h1 className="font-script font-bold text-4xl sm:text-6xl text-[#1e3a8a] drop-shadow-xs leading-none tracking-wide">
                       Merry Christmas
                     </h1>
                     <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-red-100/80 border border-red-300 text-red-800 text-xs font-extrabold uppercase tracking-wider">
@@ -146,8 +146,33 @@ export default function ChristmasPostcard({
                   </div>
 
                   {customRules ? (
-                    <div className="p-3.5 bg-white/90 rounded-2xl border border-stone-200 text-xs sm:text-sm text-stone-700 leading-relaxed whitespace-pre-line">
-                      {customRules}
+                    <div className="p-3.5 bg-white/95 rounded-2xl border border-stone-200 text-xs sm:text-sm text-stone-700 leading-relaxed space-y-1.5 font-normal max-h-64 overflow-y-auto">
+                      {customRules.split("\n").map((line, idx) => {
+                        const trimmed = line.trim();
+                        if (!trimmed) return <div key={idx} className="h-0.5" />;
+                        if (trimmed.startsWith("###") || trimmed.startsWith("##")) {
+                          return (
+                            <h4 key={idx} className="font-bold text-red-800 text-xs sm:text-sm pt-1">
+                              {trimmed.replace(/^#+\s*/, "")}
+                            </h4>
+                          );
+                        }
+                        const parts = trimmed.split(/(\*\*.*?\*\*)/g);
+                        return (
+                          <p key={idx} className="leading-snug">
+                            {parts.map((part, pIdx) => {
+                              if (part.startsWith("**") && part.endsWith("**")) {
+                                return (
+                                  <strong key={pIdx} className="font-bold text-stone-900">
+                                    {part.slice(2, -2)}
+                                  </strong>
+                                );
+                              }
+                              return part;
+                            })}
+                          </p>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
@@ -231,7 +256,7 @@ export default function ChristmasPostcard({
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                        <span className="font-holiday font-bold text-2xl sm:text-3xl text-stone-700 shrink-0">
+                        <span className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
                           from:
                         </span>
                         <span className="font-black text-xl sm:text-2xl md:text-3xl text-red-700 uppercase tracking-wide drop-shadow-xs truncate max-w-full">
@@ -256,7 +281,7 @@ export default function ChristmasPostcard({
                   <div className="space-y-4 my-2 animate-fade-up">
                     <div className="pt-1">
                       <div className="flex items-baseline gap-2 mb-1.5">
-                        <span className="font-holiday font-bold text-2xl sm:text-3xl text-stone-700">
+                        <span className="font-bold text-xl sm:text-2xl text-stone-700 italic">
                           to:
                         </span>
                         <span className="text-[11px] font-bold text-red-600 uppercase tracking-widest bg-red-100/90 px-2.5 py-0.5 rounded-full border border-red-200">
@@ -264,8 +289,8 @@ export default function ChristmasPostcard({
                         </span>
                       </div>
 
-                      <div className="pl-3.5 sm:pl-5 border-l-4 sm:border-l-6 border-red-600 bg-gradient-to-r from-red-50/95 via-amber-50/70 to-white/90 py-3 px-3.5 sm:px-4 rounded-r-2xl shadow-sm border border-l-0 border-amber-200/60">
-                        <h3 className="font-holiday font-black text-3xl sm:text-4xl md:text-5xl text-red-700 leading-tight tracking-wide drop-shadow-xs break-words">
+                      <div className="pl-3.5 sm:pl-5 border-l-4 sm:border-l-6 border-red-600 bg-gradient-to-r from-red-50/95 via-amber-50/70 to-white/90 py-3.5 px-3.5 sm:px-4 rounded-r-2xl shadow-sm border border-l-0 border-amber-200/60">
+                        <h3 className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 leading-tight tracking-tight drop-shadow-xs break-words">
                           {currentUser.name}
                         </h3>
                         <div className="flex flex-wrap items-center gap-2 mt-2">
@@ -307,7 +332,7 @@ export default function ChristmasPostcard({
                     {/* To Line (Email công ty) */}
                     <div>
                       <div className="flex items-baseline gap-2 mb-1">
-                        <label htmlFor="postcard-email" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
+                        <label htmlFor="postcard-email" className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
                           to:
                         </label>
                         <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
@@ -332,7 +357,7 @@ export default function ChristmasPostcard({
                     {/* Pass Line (4 số cuối điện thoại) */}
                     <div className="pt-1">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <label htmlFor="postcard-pass" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
+                        <label htmlFor="postcard-pass" className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
                           pass:
                         </label>
                         <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
