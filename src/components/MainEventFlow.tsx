@@ -146,6 +146,8 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
               companyName={companyName}
               companyLogo={companyLogo}
               customRules={settings.rules}
+              currentUser={userData?.currentUser}
+              onClose={() => setIsReopeningPostcard(false)}
               onSuccess={() => setIsReopeningPostcard(false)}
             />
           </div>
@@ -191,28 +193,18 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
         </div>
 
         {/* ========================================================================= */}
-        {/* SCREEN 1: BƯU THIẾP GIÁNG SINH (POSTCARD) — GỘP ĐĂNG NHẬP, THỂ LỆ & THƯ MỜI */}
+        {/* SCREEN 1: BƯU THIẾP GIÁNG SINH (POSTCARD) — MỞ MODAL RA KHI VÀO TRANG, KHÔNG CÓ NÚT TẮT */}
         {/* ========================================================================= */}
         {step === "login" && (
-          <div className="animate-fade-up">
-            {/* Header above postcard */}
-            <header className="pt-6 sm:pt-10 pb-2 text-center px-4 relative z-20 max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-3">
-                <span className="text-base">🎄</span>
-                <span>SECRET SANTA • {companyName} 2026</span>
-                <span className="text-base">🎅</span>
-              </div>
-            </header>
-
-            {/* Christmas Postcard (Vintage Airmail Postcard with rules & To/From login lines) */}
-            <section className="relative z-20">
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-pop-in">
+            <div className="relative w-full max-w-4xl my-auto">
               <ChristmasPostcard
                 companyName={companyName}
                 companyLogo={companyLogo}
                 customRules={settings.rules}
                 onSuccess={handleLoginSuccess}
               />
-            </section>
+            </div>
           </div>
         )}
 

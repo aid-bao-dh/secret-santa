@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --font-holiday: var(--font-nunito), 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-holiday: var(--font-dancing), var(--font-nunito), cursive;
   --font-sans: var(--font-nunito), var(--font-jakarta), system-ui, -apple-system, sans-serif;
 }
 

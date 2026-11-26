@@ -68,9 +68,10 @@ export default function Navbar({
         {/* Right: Quick Actions */}
         <div className="flex items-center gap-2 sm:gap-2.5">
           {currentUser && (
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-800 shadow-xs">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white border border-amber-300 rounded-xl text-xs sm:text-sm font-black shadow-md">
               <span className="text-sm">🎅</span>
               <span>{currentUser.name}</span>
+              <span className="hidden sm:inline text-amber-200 text-xs font-semibold">({currentUser.department})</span>
             </div>
           )}
 

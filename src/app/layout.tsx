@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import { Nunito, Plus_Jakarta_Sans, Dancing_Script } from "next/font/google";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -12,6 +12,12 @@ const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
+});
+
+const dancingScript = Dancing_Script({
+  variable: "--font-dancing",
+  subsets: ["latin", "vietnamese"],
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -27,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="vi"
-      className={`${nunito.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${nunito.variable} ${jakarta.variable} ${dancingScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

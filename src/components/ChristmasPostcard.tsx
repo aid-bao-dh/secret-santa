@@ -9,14 +9,22 @@ interface ChristmasPostcardProps {
   companyName?: string;
   companyLogo?: string;
   customRules?: string;
-  onSuccess: (data: RevealData) => void;
+  currentUser?: {
+    name: string;
+    department: string;
+    email: string;
+  } | null;
+  onSuccess?: (data: RevealData) => void;
+  onClose?: () => void;
 }
 
 export default function ChristmasPostcard({
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
   customRules,
+  currentUser,
   onSuccess,
+  onClose,
 }: ChristmasPostcardProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
@@ -63,7 +71,7 @@ export default function ChristmasPostcard({
       playJingleBellsMelody();
       fireGrandConfetti();
 
-      onSuccess(data);
+      onSuccess?.(data);
     } catch {
       setErrorMsg("Có lỗi kết nối đến máy chủ. Vui lòng thử lại sau.");
     } finally {
@@ -218,107 +226,163 @@ export default function ChristmasPostcard({
                   </div>
                 </div>
 
-                {/* From line */}
-                <div className="mb-5 pb-2 border-b border-stone-300 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-holiday font-bold text-xl sm:text-2xl text-stone-700">
+                {/* From line (Enlarged prominent company branding) */}
+                <div className="mb-5 pb-3.5 border-b-2 border-stone-300 flex items-center justify-between gap-3">
+                  <div className="flex items-baseline gap-2.5">
+                    <span className="font-holiday font-bold text-3xl sm:text-4xl text-stone-700">
                       from:
                     </span>
-                    <span className="font-extrabold text-sm sm:text-base text-red-700 uppercase tracking-wide">
+                    <span className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 uppercase tracking-wider drop-shadow-sm">
                       {companyName}
                     </span>
                   </div>
                   {companyLogo && (
-                    <img src={companyLogo} alt={companyName} className="h-5 sm:h-6 w-auto object-contain opacity-85" />
+                    <img
+                      src={companyLogo}
+                      alt={companyName}
+                      className="h-9 sm:h-12 w-auto max-w-[150px] object-contain drop-shadow-xs"
+                    />
                   )}
                 </div>
 
-                {/* Postcard Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* To Line (Email công ty) */}
-                  <div>
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <label htmlFor="postcard-email" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
-                        to:
-                      </label>
-                      <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-                        (Email công ty của bạn)
-                      </span>
+                {/* If already logged in: Display recipient name BIG and personal */}
+                {currentUser ? (
+                  <div className="space-y-4 my-2 animate-fade-up">
+                    <div className="pt-1">
+                      <div className="flex items-baseline gap-2 mb-1.5">
+                        <span className="font-holiday font-bold text-3xl sm:text-4xl text-stone-700">
+                          to:
+                        </span>
+                        <span className="text-[11px] font-bold text-red-600 uppercase tracking-widest bg-red-100/90 px-2.5 py-0.5 rounded-full border border-red-200">
+                          Người nhận thư 💌
+                        </span>
+                      </div>
+
+                      <div className="pl-4 sm:pl-5 border-l-4 sm:border-l-6 border-red-600 bg-gradient-to-r from-red-50/95 via-amber-50/70 to-white/90 py-3.5 px-4 rounded-r-2xl shadow-sm border border-l-0 border-amber-200/60">
+                        <h3 className="font-holiday font-black text-4xl sm:text-5xl md:text-6xl text-red-700 leading-tight tracking-wide drop-shadow-xs">
+                          {currentUser.name}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs sm:text-sm font-bold border border-emerald-300 shadow-xs">
+                            <span>🏢</span>
+                            <span>Phòng {currentUser.department}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-stone-100 text-stone-600 rounded-lg text-xs font-mono border border-stone-200">
+                            ✉️ {currentUser.email}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="relative">
-                      <Mail className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
-                      <input
-                        id="postcard-email"
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="ten.nguyen@globalsafe.vn"
-                        className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal transition"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Pass Line (4 số cuối điện thoại) */}
-                  <div className="pt-1">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <label htmlFor="postcard-pass" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
-                        pass:
-                      </label>
-                      <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
-                        (4 số cuối điện thoại)
-                      </span>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-100/90 border border-emerald-300 rounded-xl text-emerald-800 text-xs sm:text-sm font-bold shadow-xs">
+                      <span>✅</span>
+                      <span>ĐÃ XÁC THỰC THÀNH VIÊN {companyName}</span>
                     </div>
 
-                    <div className="relative">
-                      <Lock className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
-                      <input
-                        id="postcard-pass"
-                        type="password"
-                        inputMode="numeric"
-                        maxLength={4}
-                        required
-                        value={phoneLast4}
-                        onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, ""))}
-                        placeholder="•••• (4 chữ số)"
-                        className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal tracking-widest transition"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Error Notification */}
-                  {errorMsg && (
-                    <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">
-                      ⚠️ {errorMsg}
-                    </div>
-                  )}
-
-                  {/* Submit Button (Wax seal style / Festive Postcard Stamp Action) */}
-                  <div className="pt-3">
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Gift className="w-5 h-5 animate-spin text-yellow-200" />
-                          <span>Đang bóc tem &amp; mở thư...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>MỞ THƯ &amp; VÀO SỰ KIỆN</span>
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-                        </>
-                      )}
-                    </button>
-
-                    <p className="text-center text-[11px] text-stone-500 mt-2 font-medium">
-                      👆 Nhập thông tin để mở hộp quà và theo dõi đồng hồ đếm ngược!
+                    <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/90">
+                      🎅 Bức thư mời Secret Santa đã được trao riêng cho bạn! Hãy cùng vào chuẩn bị món quà ý nghĩa dưới 200k và sẵn sàng cho đêm tiệc Giáng Sinh nhé!
                     </p>
+
+                    {onClose && (
+                      <div className="pt-2">
+                        <button
+                          onClick={onClose}
+                          className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <span>QUAY LẠI MỞ HỘP QUÀ &amp; ĐẾM NGƯỢC 🎁</span>
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </form>
+                ) : (
+                  /* Postcard Form for logging in */
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* To Line (Email công ty) */}
+                    <div>
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <label htmlFor="postcard-email" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
+                          to:
+                        </label>
+                        <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                          (Email công ty của bạn)
+                        </span>
+                      </div>
+
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
+                        <input
+                          id="postcard-email"
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="ten.nguyen@globalsafe.vn"
+                          className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal transition"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Pass Line (4 số cuối điện thoại) */}
+                    <div className="pt-1">
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <label htmlFor="postcard-pass" className="font-holiday font-bold text-xl sm:text-2xl text-stone-700 shrink-0">
+                          pass:
+                        </label>
+                        <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                          (4 số cuối điện thoại)
+                        </span>
+                      </div>
+
+                      <div className="relative">
+                        <Lock className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
+                        <input
+                          id="postcard-pass"
+                          type="password"
+                          inputMode="numeric"
+                          maxLength={4}
+                          required
+                          value={phoneLast4}
+                          onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, ""))}
+                          placeholder="•••• (4 chữ số)"
+                          className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal tracking-widest transition"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Error Notification */}
+                    {errorMsg && (
+                      <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">
+                        ⚠️ {errorMsg}
+                      </div>
+                    )}
+
+                    {/* Submit Button (Wax seal style / Festive Postcard Stamp Action) */}
+                    <div className="pt-3">
+                      <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {isLoading ? (
+                          <>
+                            <Gift className="w-5 h-5 animate-spin text-yellow-200" />
+                            <span>Đang bóc tem &amp; mở thư...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>MỞ THƯ &amp; VÀO SỰ KIỆN</span>
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                          </>
+                        )}
+                      </button>
+
+                      <p className="text-center text-[11px] text-stone-500 mt-2 font-medium">
+                        👆 Nhập thông tin để mở hộp quà và theo dõi đồng hồ đếm ngược!
+                      </p>
+                    </div>
+                  </form>
+                )}
               </div>
 
               {/* Postcard Postal Watermark */}
