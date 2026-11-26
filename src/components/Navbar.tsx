@@ -2,15 +2,33 @@
 
 import Link from "next/link";
 
+import { LogOut } from "lucide-react";
+
 interface NavbarProps {
   companyName?: string;
   companyLogo?: string;
+  currentUser?: {
+    name: string;
+    department: string;
+  } | null;
+  onLogout?: () => void;
+  onReopenLetter?: () => void;
 }
 
 export default function Navbar({
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
+  currentUser,
+  onLogout,
+  onReopenLetter,
 }: NavbarProps) {
+  const handleLetterClick = () => {
+    if (onReopenLetter) {
+      onReopenLetter();
+    } else {
+      window.dispatchEvent(new Event("reopen-welcome-letter"));
+    }
+  };
   return (
     <nav className="w-full bg-white/95 border-b border-red-100 backdrop-blur-md sticky top-0 z-40 transition-all shadow-sm">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -48,11 +66,18 @@ export default function Navbar({
         </Link>
 
         {/* Right: Quick Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {currentUser && (
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-800 shadow-xs">
+              <span className="text-sm">🎅</span>
+              <span>{currentUser.name}</span>
+            </div>
+          )}
+
           <button
-            onClick={() => window.dispatchEvent(new Event("reopen-welcome-letter"))}
+            onClick={handleLetterClick}
             className="flex items-center gap-1.5 py-2 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 font-bold text-xs rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
-            title="Mở lại Thư Chào Mừng"
+            title="Mở lại Thư Mời"
           >
             <span>💌</span>
             <span className="hidden sm:inline">Thư Mời</span>
@@ -60,12 +85,23 @@ export default function Navbar({
 
           <Link
             href="/penalty"
-            className="flex items-center gap-1.5 py-2 px-3 sm:px-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl transition shadow-xs active:scale-95"
+            className="flex items-center gap-1.5 py-2 px-3 sm:px-3.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl transition shadow-xs active:scale-95"
           >
             <span>🎪</span>
             <span className="hidden sm:inline">Vòng Quay</span>
-            <span>Thăm Phạt</span>
+            <span className="sm:hidden">Quay</span>
           </Link>
+
+          {currentUser && onLogout && (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1 py-2 px-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-stone-900 font-medium text-xs rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
+              title="Đổi tài khoản / Đăng xuất"
+            >
+              <LogOut className="w-3.5 h-3.5 text-stone-500" />
+              <span className="hidden md:inline">Đổi tài khoản</span>
+            </button>
+          )}
         </div>
       </div>
     </nav>

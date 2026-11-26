@@ -9,6 +9,11 @@ interface WelcomeLetterProps {
   companyLogo?: string;
   revealDate?: string;
   eventDate?: string;
+  isOpen?: boolean;
+  recipientName?: string;
+  recipientDepartment?: string;
+  onProceedToEvent?: () => void;
+  onClose?: () => void;
 }
 
 function formatDayMonth(dateStr?: string, fallback = "27/11"): string {
@@ -137,18 +142,23 @@ export default function WelcomeLetter({
   companyLogo = "/assets/logo.png",
   revealDate = "2026-11-27T00:00:00",
   eventDate = "2026-12-24T18:00:00",
+  isOpen,
+  recipientName,
+  recipientDepartment,
+  onProceedToEvent,
+  onClose,
 }: WelcomeLetterProps) {
   const revealDayLabel = formatDayMonth(revealDate, "27/11");
   const eventDayLabel = formatDayMonth(eventDate, "24/12");
-  // Default to closed so users land directly on the Home page & login form
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const activeOpen = isOpen !== undefined ? isOpen : internalOpen;
   const [stage, setStage] = useState<WelcomeStage>("sealed");
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
     const handleReopen = () => {
       setStage("sealed");
-      setIsOpen(true);
+      setInternalOpen(true);
     };
     window.addEventListener("reopen-welcome-letter", handleReopen);
     return () => window.removeEventListener("reopen-welcome-letter", handleReopen);
@@ -178,21 +188,23 @@ export default function WelcomeLetter({
     fireGrandConfetti();
 
     setTimeout(() => {
-      setIsOpen(false);
+      setInternalOpen(false);
       setStage("sealed");
-      const unboxEl = document.getElementById("unbox-section");
-      if (unboxEl) {
-        unboxEl.scrollIntoView({ behavior: "smooth" });
+      if (onProceedToEvent) {
+        onProceedToEvent();
+      } else {
+        onClose?.();
       }
     }, 450);
   };
 
   const handleSkip = () => {
-    setIsOpen(false);
+    setInternalOpen(false);
     setStage("sealed");
+    onClose?.();
   };
 
-  if (!isOpen) {
+  if (!activeOpen) {
     return null;
   }
 
@@ -355,9 +367,17 @@ export default function WelcomeLetter({
 
                   {/* Envelope Bottom Addressee */}
                   <div className="relative z-10 text-center">
-                    <div className="inline-block px-4 py-1.5 rounded-full bg-black/25 border border-amber-200/35">
+                    <div className="inline-block px-4 py-1.5 rounded-full bg-black/35 border border-amber-200/40 backdrop-blur-xs">
                       <span className="text-xs text-amber-100 font-semibold">
-                        Gửi riêng: <strong className="text-white">Thành viên {companyName}</strong>
+                        {recipientName ? (
+                          <>
+                            Gửi riêng: <strong className="text-white font-bold">{recipientName}</strong> • Phòng {recipientDepartment || companyName}
+                          </>
+                        ) : (
+                          <>
+                            Gửi riêng: <strong className="text-white font-bold">Thành viên {companyName}</strong>
+                          </>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -490,7 +510,7 @@ export default function WelcomeLetter({
                 onClick={handleEnterEvent}
                 className="btn-shimmer group w-full sm:w-auto flex items-center justify-center gap-3 px-9 py-4 bg-gradient-to-r from-red-600 via-rose-500 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] active:scale-95 border-2 border-amber-200 cursor-pointer"
               >
-                <span>KHÁM PHÁ NGAY THÔI</span>
+                <span>VÀO MỞ HỘP QUÀ &amp; ĐẾM NGƯỢC 🎁</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </button>
 

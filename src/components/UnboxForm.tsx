@@ -6,32 +6,37 @@ import { Gift, Lock, Mail, Sparkles, AlertCircle, ArrowRight, ShieldCheck } from
 import RevealModal from "./RevealModal";
 import { playChristmasChime } from "./WelcomeLetter";
 
-interface RevealData {
+export interface RevealData {
   currentUser: {
+    id?: string;
     name: string;
     email: string;
     department: string;
   };
-  giftRecipient: {
+  giftRecipient?: {
     name: string;
     department: string;
     avatar: string;
     bio?: string;
   };
-  santaHints: string[];
+  santaHints?: string[];
   wasViewedBefore?: boolean;
+  notMatchedYet?: boolean;
+  message?: string;
 }
 
 interface UnboxFormProps {
   companyName?: string;
   companyLogo?: string;
   className?: string;
+  onSuccess?: (data: RevealData) => void;
 }
 
 export default function UnboxForm({
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
   className = "",
+  onSuccess,
 }: UnboxFormProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
@@ -85,7 +90,11 @@ export default function UnboxForm({
         return;
       }
 
-      setRevealData(data);
+      if (onSuccess) {
+        onSuccess(data);
+      } else {
+        setRevealData(data);
+      }
     } catch {
       setErrorMsg("Có lỗi kết nối đến máy chủ. Vui lòng thử lại sau.");
     } finally {

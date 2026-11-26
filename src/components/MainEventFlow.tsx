@@ -1,0 +1,447 @@
+"use client";
+
+import { useState, useSyncExternalStore } from "react";
+import Link from "next/link";
+import confetti from "canvas-confetti";
+import { Gift, ArrowRight, ShieldCheck } from "lucide-react";
+import SnowEffect from "./SnowEffect";
+import FairyLights from "./FairyLights";
+import Navbar from "./Navbar";
+import Countdown from "./Countdown";
+import RulesSection from "./RulesSection";
+import UnboxForm, { RevealData } from "./UnboxForm";
+import WelcomeLetter, { playChristmasChime } from "./WelcomeLetter";
+import RevealModal from "./RevealModal";
+import RevealOnScroll from "./RevealOnScroll";
+
+interface Settings {
+  companyName?: string;
+  companyLogo?: string;
+  revealDate?: string;
+  eventDate?: string;
+  rules?: string;
+}
+
+interface MainEventFlowProps {
+  settings: Settings;
+}
+
+type FlowStep = "login" | "letter" | "event";
+
+const emptySubscribe = () => () => {};
+
+function subscribeSession(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("ss-session-change", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("ss-session-change", callback);
+  };
+}
+
+function getStoredUser(): RevealData | null {
+  try {
+    const raw = sessionStorage.getItem("ss_user_data");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function getStoredStep(): FlowStep {
+  try {
+    const saved = sessionStorage.getItem("ss_flow_step") as FlowStep | null;
+    return saved === "event" || saved === "letter" ? saved : "login";
+  } catch {
+    return "login";
+  }
+}
+
+export default function MainEventFlow({ settings }: MainEventFlowProps) {
+  const companyName = settings.companyName || "GLOBAL SAFE";
+  const companyLogo = settings.companyLogo || "/assets/logo.png";
+  const revealDate = settings.revealDate || "2026-11-27T00:00:00";
+  const eventDate = settings.eventDate || "2026-12-24T18:00:00";
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
+  const storedUser = useSyncExternalStore(
+    subscribeSession,
+    getStoredUser,
+    () => null
+  );
+
+  const storedStep = useSyncExternalStore<FlowStep>(
+    subscribeSession,
+    getStoredStep,
+    (): FlowStep => "login"
+  );
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReopeningLetter, setIsReopeningLetter] = useState(false);
+
+  const userData = storedUser;
+  const step: FlowStep = userData ? storedStep : "login";
+
+  const handleLoginSuccess = (data: RevealData) => {
+    try {
+      sessionStorage.setItem("ss_user_data", JSON.stringify(data));
+      sessionStorage.setItem("ss_flow_step", "letter");
+      window.dispatchEvent(new Event("ss-session-change"));
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  const handleProceedToEvent = () => {
+    try {
+      sessionStorage.setItem("ss_flow_step", "event");
+      window.dispatchEvent(new Event("ss-session-change"));
+    } catch {
+      // ignore storage errors
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleLogout = () => {
+    try {
+      sessionStorage.removeItem("ss_user_data");
+      sessionStorage.removeItem("ss_flow_step");
+      window.dispatchEvent(new Event("ss-session-change"));
+    } catch {
+      // ignore storage errors
+    }
+    setIsModalOpen(false);
+    setIsReopeningLetter(false);
+  };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#fafaf9] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl animate-bounce mb-2">🎄</div>
+          <div className="text-xs font-bold text-stone-500 uppercase tracking-widest">
+            Secret Santa 2026 • Đang tải...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <main className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+      {/* STEP 2: WELCOME INVITATION LETTER OVERLAY */}
+      {step === "letter" && userData && (
+        <WelcomeLetter
+          isOpen={true}
+          companyName={companyName}
+          companyLogo={companyLogo}
+          revealDate={revealDate}
+          eventDate={eventDate}
+          recipientName={userData.currentUser.name}
+          recipientDepartment={userData.currentUser.department}
+          onProceedToEvent={handleProceedToEvent}
+          onClose={handleProceedToEvent}
+        />
+      )}
+
+      {/* REOPENED LETTER OVERLAY (WHEN IN EVENT STEP) */}
+      {isReopeningLetter && (
+        <WelcomeLetter
+          isOpen={true}
+          companyName={companyName}
+          companyLogo={companyLogo}
+          revealDate={revealDate}
+          eventDate={eventDate}
+          recipientName={userData?.currentUser.name}
+          recipientDepartment={userData?.currentUser.department}
+          onClose={() => setIsReopeningLetter(false)}
+        />
+      )}
+
+      {/* Clean Static Winter Backdrop */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-[#fafaf9]" />
+        <div
+          className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/[0.04] rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: "6s" }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/[0.04] rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: "7s" }}
+        />
+      </div>
+
+      {/* Gentle Snowfall Background */}
+      <SnowEffect />
+
+      <div>
+        {/* Top Navigation Bar */}
+        <Navbar
+          companyName={companyName}
+          companyLogo={companyLogo}
+          currentUser={step === "event" ? userData?.currentUser : null}
+          onLogout={handleLogout}
+          onReopenLetter={() => setIsReopeningLetter(true)}
+        />
+
+        {/* Twinkling Christmas Lights Garland */}
+        <FairyLights />
+
+        {/* Flying Santa Sleigh across upper sky */}
+        <div className="w-full overflow-hidden pointer-events-none relative h-0 z-10" aria-hidden="true">
+          <div className="animate-sleigh inline-flex items-center gap-1 text-xl sm:text-2xl opacity-75 select-none whitespace-nowrap pt-2">
+            <span>✨</span>
+            <span>🛷🎅</span>
+            <span>🦌🦌</span>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* STEP 1: TRANG ĐẦU TIÊN — ĐĂNG NHẬP CÓ THỂ LỆ                              */}
+        {/* ========================================================================= */}
+        {step === "login" && (
+          <div className="animate-fade-up">
+            {/* Header for Login Step */}
+            <header className="pt-8 sm:pt-12 pb-4 text-center px-4 relative z-20 max-w-4xl mx-auto">
+              <span
+                className="hidden lg:block absolute left-2 top-14 text-3xl opacity-70 animate-float-slow select-none pointer-events-none"
+                aria-hidden="true"
+              >
+                🎄
+              </span>
+              <span
+                className="hidden lg:block absolute right-2 top-20 text-3xl opacity-70 animate-float-reverse select-none pointer-events-none"
+                aria-hidden="true"
+              >
+                🔔
+              </span>
+
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-5">
+                <span className="text-base">🎄</span>
+                <span>SECRET SANTA • {companyName} 2026</span>
+                <span className="text-base">🎅</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-500 to-emerald-700 animate-gradient-flow drop-shadow-xs leading-tight mb-3">
+                ĐĂNG NHẬP THAM GIA MÙA LỄ HỘI
+              </h1>
+
+              <p className="text-stone-700 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed font-medium">
+                Chào mừng bạn đến với sự kiện Secret Santa 2026! Vui lòng đọc kỹ thể lệ và đăng nhập để nhận bức thư mời bí mật từ Bắc Cực. ✨💌
+              </p>
+            </header>
+
+            {/* Login & Rules Hub: 2-Column Side-by-Side Layout */}
+            <section id="unbox-section" className="max-w-6xl mx-auto px-4 my-6 sm:my-10 relative z-20">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* Column 1: Event Rules (7 cols on desktop) */}
+                <div className="lg:col-span-7 w-full order-2 lg:order-1">
+                  <RulesSection customRules={settings.rules} />
+                </div>
+
+                {/* Column 2: Login Form (5 cols on desktop) */}
+                <div className="lg:col-span-5 w-full order-1 lg:order-2">
+                  <UnboxForm
+                    companyName={companyName}
+                    companyLogo={companyLogo}
+                    onSuccess={handleLoginSuccess}
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* STEP 3: PHẦN MỞ HỘP CÓ THÔNG TIN ĐẾM NGƯỢC (EVENT HUB)                    */}
+        {/* ========================================================================= */}
+        {step === "event" && userData && (
+          <div className="animate-fade-up">
+            {/* Main Hero Header */}
+            <header className="pt-8 sm:pt-12 pb-4 text-center px-4 relative z-20 max-w-4xl mx-auto">
+              <span
+                className="hidden lg:block absolute left-2 top-14 text-3xl opacity-70 animate-float-slow select-none pointer-events-none"
+                aria-hidden="true"
+              >
+                🎄
+              </span>
+              <span
+                className="hidden lg:block absolute right-2 top-20 text-3xl opacity-70 animate-float-reverse select-none pointer-events-none"
+                aria-hidden="true"
+              >
+                🔔
+              </span>
+
+              {/* Greeting Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-6">
+                <span className="text-base">🎅</span>
+                <span>CHÀO BẠN: {userData.currentUser.name.toUpperCase()} • PHÒNG {userData.currentUser.department}</span>
+                <span className="text-base">✨</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-500 to-emerald-700 animate-gradient-flow drop-shadow-xs leading-tight sm:leading-tight mb-4">
+                MÙA NOEL NÀY, BẠN LÀ SANTA CỦA AI?
+              </h1>
+
+              <p className="text-stone-700 text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-6 font-medium">
+                Mở hộp quà bí mật từ Bắc Cực, trao gửi món quà yêu thương (ngân sách dưới 200.000đ) và cùng thử tài thám tử giải mã danh tính Santa của bạn! ✨🎁
+              </p>
+
+              {/* COUNTDOWN TO REVEAL DATE / EVENT DATE */}
+              <div className="animate-fade-up" style={{ animationDelay: "200ms" }}>
+                <Countdown revealDate={revealDate} eventDate={eventDate} />
+              </div>
+            </header>
+
+            {/* INTERACTIVE GIFT BOX SECTION (PHẦN MỞ HỘP QUÀ) */}
+            <section className="max-w-xl mx-auto px-4 my-8 relative z-20 text-center">
+              <RevealOnScroll delay={80}>
+                <div className="bg-white/95 border-2 border-red-500/35 rounded-3xl p-6 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.08)] backdrop-blur-md relative overflow-hidden">
+                  {/* Decorative Sparkles */}
+                  <div className="absolute top-3 left-4 text-2xl select-none animate-float-slow">✨</div>
+                  <div className="absolute top-3 right-4 text-2xl select-none animate-float-reverse">❄️</div>
+
+                  {/* 3D Hopping Festive Gift Box Hero */}
+                  <div
+                    onClick={() => {
+                      playChristmasChime();
+                      confetti({
+                        particleCount: 40,
+                        spread: 60,
+                        origin: { y: 0.5 },
+                        colors: ["#dc2626", "#16a34a", "#f59e0b", "#ffffff"],
+                      });
+                      setIsModalOpen(true);
+                    }}
+                    className="inline-block relative cursor-pointer select-none transition-transform duration-300 animate-gift-hop hover:scale-110 active:scale-95 my-3"
+                    title="Chạm nhẹ để mở thẻ nhiệm vụ!"
+                  >
+                    <div className="absolute inset-0 bg-red-400/30 rounded-full blur-2xl -z-10" />
+                    <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-br from-red-500 via-rose-600 to-red-800 shadow-[0_18px_36px_rgba(220,38,38,0.4)] border-3 border-amber-300 flex items-center justify-center relative">
+                      <div className="absolute inset-y-0 w-8 bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 shadow-sm" />
+                      <div className="absolute inset-x-0 h-8 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 shadow-sm" />
+                      <div className="absolute -top-5 text-5xl filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">🎀</div>
+                      <Gift className="w-14 h-14 text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
+                      <div className="absolute -bottom-3 -right-2 bg-emerald-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-md border border-emerald-300 rotate-[-6deg] flex items-center gap-1">
+                        <span>🏷️ Mở Quà</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="text-2xl sm:text-3xl font-holiday font-bold text-red-800 mt-4 drop-shadow-sm">
+                    Hộp Quà Của {userData.currentUser.name} 🎁
+                  </h3>
+
+                  <p className="text-stone-600 text-xs sm:text-sm mt-1 max-w-md mx-auto leading-relaxed">
+                    Nhiệm vụ trao quà bí mật và 3 manh mối truy tìm Santa đã được phong ấn trong hộp quà này!
+                  </p>
+
+                  {/* Main Action Button */}
+                  <div className="mt-6 space-y-3">
+                    <button
+                      onClick={() => {
+                        playChristmasChime();
+                        setIsModalOpen(true);
+                      }}
+                      className="btn-shimmer w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-red-600/30 transition-all hover:-translate-y-0.5 active:scale-98 border-2 border-amber-200 cursor-pointer flex items-center justify-center gap-2.5"
+                    >
+                      <Gift className="w-5 h-5 text-yellow-200" />
+                      <span>BẤM ĐỂ MỞ HỘP QUÀ / XEM THẺ NHIỆM VỤ</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+
+                    {/* Quick Guide Tag */}
+                    <div className="px-4 py-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-center justify-between text-xs text-amber-950 font-semibold shadow-xs">
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-base">🎁</span>
+                        <span>Ngân sách: <strong className="text-red-700 font-bold">Dưới 200.000đ</strong> (tự do chọn quà)</span>
+                      </span>
+                      <span className="text-emerald-700 flex items-center gap-1 shrink-0">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Giữ bí mật</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </RevealOnScroll>
+            </section>
+
+            {/* POPUP REVEAL MODAL */}
+            {isModalOpen && (
+              <RevealModal
+                data={userData}
+                companyName={companyName}
+                companyLogo={companyLogo}
+                initialStage="card"
+                onClose={() => setIsModalOpen(false)}
+              />
+            )}
+
+            {/* PENALTY MINI-GAME BANNER */}
+            <section className="max-w-4xl mx-auto px-4 my-8 relative z-20">
+              <RevealOnScroll delay={100}>
+                <div className="bg-white/92 border-2 border-red-500/40 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-md hover:border-red-500/60 transition-colors">
+                  <div className="space-y-2 text-center sm:text-left">
+                    <span className="text-xs px-3 py-1 bg-red-100 text-red-700 border border-red-300 rounded-full font-bold inline-block">
+                      🎪 Tiệc Noel Công Ty
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl font-black text-red-800 drop-shadow-xs">
+                      Vòng Quay Thăm Hình Phạt 🎡
+                    </h3>
+                    <p className="text-xs sm:text-sm text-stone-600 max-w-md">
+                      Khu vực quay số trừng phạt cho ai quên chuẩn bị quà hoặc đoán sai Santa trong buổi tiệc (do Nhi phụ trách)!
+                    </p>
+                  </div>
+
+                  <Link
+                    href="/penalty"
+                    className="btn-shimmer py-4 px-7 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-red-600/25 transition-all hover:-translate-y-0.5 whitespace-nowrap active:scale-95 border border-red-300"
+                  >
+                    Mở Vòng Quay 🎯
+                  </Link>
+                </div>
+              </RevealOnScroll>
+            </section>
+
+            {/* EVENT RULES REFERENCE AT BOTTOM OF EVENT PAGE */}
+            <section className="max-w-4xl mx-auto px-4 my-8 relative z-20">
+              <RevealOnScroll delay={100}>
+                <RulesSection customRules={settings.rules} />
+              </RevealOnScroll>
+            </section>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <footer className="relative z-20 border-t border-stone-200/60 bg-white/90 py-8 px-4 text-center text-xs text-stone-600 mt-12 backdrop-blur-md">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 font-medium">
+            <img src={companyLogo} alt={companyName} className="h-6 w-auto object-contain" />
+            <span>•</span>
+            <span>Secret Santa © 2026</span>
+          </div>
+
+          <div className="flex items-center gap-4 font-medium">
+            {step === "event" && (
+              <button
+                onClick={() => setIsReopeningLetter(true)}
+                className="hover:text-red-600 transition cursor-pointer"
+              >
+                💌 Xem lại thư mời
+              </button>
+            )}
+            <Link href="/penalty" className="hover:text-red-600 transition">
+              Vòng quay hình phạt
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}

@@ -22,17 +22,20 @@ interface RevealModalProps {
       email: string;
       department: string;
     };
-    giftRecipient: {
+    giftRecipient?: {
       name: string;
       department: string;
       avatar: string;
       bio?: string;
     };
-    santaHints: string[];
+    santaHints?: string[];
     wasViewedBefore?: boolean;
+    notMatchedYet?: boolean;
+    message?: string;
   };
   companyName?: string;
   companyLogo?: string;
+  initialStage?: "envelope" | "card";
   onClose: () => void;
 }
 
@@ -51,9 +54,10 @@ export default function RevealModal({
   data,
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
+  initialStage = "card",
   onClose,
 }: RevealModalProps) {
-  const [stage, setStage] = useState<"envelope" | "unsealing" | "card">("envelope");
+  const [stage, setStage] = useState<"envelope" | "unsealing" | "card">(initialStage);
   const [activeTab, setActiveTab] = useState<"recipient" | "hints">("recipient");
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -85,13 +89,17 @@ export default function RevealModal({
   };
 
   const handleDownload = async () => {
+    if (!data.giftRecipient) {
+      alert("Chưa có thông tin người nhận để tạo thẻ!");
+      return;
+    }
     setIsDownloading(true);
     setDownloadSuccess(false);
     try {
       const dataUrl = await generateSecretSantaCard({
         currentUser: data.currentUser,
         giftRecipient: data.giftRecipient,
-        santaHints: data.santaHints,
+        santaHints: data.santaHints || [],
       });
 
       const link = document.createElement("a");
@@ -315,63 +323,75 @@ export default function RevealModal({
                 /* TAB 1: RECIPIENT PROFILE */
                 <div key="recipient" className="space-y-4 animate-fade-up">
                   <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-red-200 shadow-sm relative flex flex-col items-center text-center">
-                    <span className="inline-block px-3.5 py-1 bg-red-600 text-white font-bold rounded-full text-xs shadow-sm mb-4">
-                      🎁 BẠN CHÍNH LÀ SANTA BÍ MẬT CỦA:
-                    </span>
-
-                    {/* Circular Avatar with Green & Red Ring */}
-                    <div className="relative inline-block mb-3">
-                      <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-red-500 shadow-md mx-auto bg-stone-100">
-                        {data.giftRecipient.avatar ? (
-                          <img
-                            src={data.giftRecipient.avatar}
-                            alt={data.giftRecipient.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-5xl bg-red-600 text-white font-bold font-holiday">
-                            {data.giftRecipient.name.charAt(0)}
-                          </div>
-                        )}
-                      </div>
-                      <span className="absolute -bottom-1 -right-1 text-2xl filter drop-shadow">🎄</span>
-                    </div>
-
-                    {/* Name */}
-                    <h3 className="text-2xl sm:text-3xl font-holiday font-black text-red-800 tracking-tight">
-                      {data.giftRecipient.name}
-                    </h3>
-
-                    {/* Department Badge */}
-                    <div className="flex items-center justify-center gap-1 mt-1.5">
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-xs font-bold rounded-full shadow-sm">
-                        <Building className="w-3.5 h-3.5" />
-                        Phòng {data.giftRecipient.department}
-                      </span>
-                    </div>
-
-                    {/* Bio (if any) */}
-                    {data.giftRecipient.bio && (
-                      <div className="w-full mt-4 p-3.5 bg-stone-50 rounded-2xl text-left border border-stone-200">
-                        <span className="text-[11px] font-bold text-stone-500 uppercase block mb-0.5">
-                          Đôi nét về đồng nghiệp:
-                        </span>
-                        <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                          {data.giftRecipient.bio}
+                    {!data.giftRecipient ? (
+                      <div className="py-8">
+                        <span className="text-4xl block mb-3 animate-bounce">⏳</span>
+                        <h3 className="text-xl font-bold text-red-800 mb-2 font-holiday">Đang Chuẩn Bị Ghép Cặp</h3>
+                        <p className="text-xs sm:text-sm text-stone-600 max-w-sm mx-auto leading-relaxed">
+                          {data.message || "Ban tổ chức đang chuẩn bị danh sách ghép cặp. Bạn vui lòng theo dõi đồng hồ đếm ngược và quay lại vào ngày công bố nhé! 🎄"}
                         </p>
                       </div>
-                    )}
+                    ) : (
+                      <>
+                        <span className="inline-block px-3.5 py-1 bg-red-600 text-white font-bold rounded-full text-xs shadow-sm mb-4">
+                          🎁 BẠN CHÍNH LÀ SANTA BÍ MẬT CỦA:
+                        </span>
 
-                    {/* Free Gift Budget Guide (< 200k) */}
-                    <div className="w-full mt-4 p-4 bg-red-50/70 border border-red-200 rounded-2xl shadow-inner text-left">
-                      <div className="flex items-center gap-2 text-red-700 font-bold text-xs uppercase tracking-wider mb-1.5">
-                        <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>Gợi Ý Chuẩn Bị Quà (Dưới 200.000đ):</span>
-                      </div>
-                      <p className="text-stone-800 text-xs sm:text-sm leading-relaxed font-medium">
-                        Mọi người tự do chọn một món quà bất ngờ, thú vị hoặc thiết thực trong khoảng giá trị <strong className="text-red-700 font-bold">dưới 200.000đ</strong> để dành tặng đồng nghiệp nhé! 🎁
-                      </p>
-                    </div>
+                        {/* Circular Avatar with Green & Red Ring */}
+                        <div className="relative inline-block mb-3">
+                          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-red-500 shadow-md mx-auto bg-stone-100">
+                            {data.giftRecipient.avatar ? (
+                              <img
+                                src={data.giftRecipient.avatar}
+                                alt={data.giftRecipient.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-5xl bg-red-600 text-white font-bold font-holiday">
+                                {data.giftRecipient.name.charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                          <span className="absolute -bottom-1 -right-1 text-2xl filter drop-shadow">🎄</span>
+                        </div>
+
+                        {/* Name */}
+                        <h3 className="text-2xl sm:text-3xl font-holiday font-black text-red-800 tracking-tight">
+                          {data.giftRecipient.name}
+                        </h3>
+
+                        {/* Department Badge */}
+                        <div className="flex items-center justify-center gap-1 mt-1.5">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-xs font-bold rounded-full shadow-sm">
+                            <Building className="w-3.5 h-3.5" />
+                            Phòng {data.giftRecipient.department}
+                          </span>
+                        </div>
+
+                        {/* Bio (if any) */}
+                        {data.giftRecipient.bio && (
+                          <div className="w-full mt-4 p-3.5 bg-stone-50 rounded-2xl text-left border border-stone-200">
+                            <span className="text-[11px] font-bold text-stone-500 uppercase block mb-0.5">
+                              Đôi nét về đồng nghiệp:
+                            </span>
+                            <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
+                              {data.giftRecipient.bio}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Free Gift Budget Guide (< 200k) */}
+                        <div className="w-full mt-4 p-4 bg-red-50/70 border border-red-200 rounded-2xl shadow-inner text-left">
+                          <div className="flex items-center gap-2 text-red-700 font-bold text-xs uppercase tracking-wider mb-1.5">
+                            <Sparkles className="w-4 h-4 text-amber-500" />
+                            <span>Gợi Ý Chuẩn Bị Quà (Dưới 200.000đ):</span>
+                          </div>
+                          <p className="text-stone-800 text-xs sm:text-sm leading-relaxed font-medium">
+                            Mọi người tự do chọn một món quà bất ngờ, thú vị hoặc thiết thực trong khoảng giá trị <strong className="text-red-700 font-bold">dưới 200.000đ</strong> để dành tặng đồng nghiệp nhé! 🎁
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 text-center flex items-center justify-center gap-2 font-medium">
@@ -395,7 +415,7 @@ export default function RevealModal({
                   </div>
 
                   <div className="space-y-2.5">
-                    {data.santaHints.map((hint, index) => {
+                    {(data.santaHints || []).map((hint, index) => {
                       const parts = hint.split(":");
                       const title = parts[0]?.trim();
                       const answer = parts.slice(1).join(":")?.trim();

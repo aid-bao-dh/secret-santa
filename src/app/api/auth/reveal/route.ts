@@ -52,8 +52,14 @@ export async function POST(req: NextRequest) {
       const settings = await getSettings();
       const dayLabel = formatDayMonth(settings.revealDate, "27/11");
       return NextResponse.json({
-        success: false,
+        success: true,
         notMatchedYet: true,
+        currentUser: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          department: user.department,
+        },
         userName: user.name,
         message: `Ban tổ chức đang chuẩn bị danh sách ghép cặp. Bạn vui lòng quay lại vào ngày công bố (${dayLabel}) nhé! 🎄`,
       });
