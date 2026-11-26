@@ -134,16 +134,14 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
         {/* CASE A: SEALED ENVELOPE (LÚC ĐẦU PHONG THƯ ĐÓNG KÍN, CẦN XÉ ĐỂ MỞ)        */}
         {/* ========================================================================= */}
         {!isEnvelopeOpened ? (
-          <div className="relative w-full bg-[#fcf9f2] rounded-[18px] sm:rounded-[24px] p-6 sm:p-10 md:p-12 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden min-h-[460px] sm:min-h-[520px] flex flex-col justify-between">
-            {/* Subtle vintage envelope fold line */}
-            <svg className="absolute top-0 left-0 right-0 w-full h-36 sm:h-44 pointer-events-none z-10 opacity-30" preserveAspectRatio="none" viewBox="0 0 100 100">
-              <path d="M 0 0 L 50 100 L 100 0" fill="none" stroke="#92400e" strokeWidth="1" strokeDasharray="3 3" />
-            </svg>
+          <div className="relative w-full bg-[#fcf9f2] rounded-[18px] sm:rounded-[24px] p-6 sm:p-10 md:p-12 shadow-inner border border-amber-900/15 text-stone-800 overflow-hidden min-h-[460px] sm:min-h-[500px] flex flex-col justify-between">
+            {/* Subtle vintage stationery dot texture */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(#92400e_1px,transparent_1px)] [background-size:18px_18px]" />
 
             {/* Top Bar: Airmail Stamp & Postmark Ink */}
-            <div className="flex items-start justify-between relative z-20">
+            <div className="flex items-center justify-between relative z-20">
               {/* Circular Postal Postmark */}
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-3">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-dashed border-red-500/70 p-1 flex items-center justify-center text-center -rotate-6 select-none shadow-xs">
                   <div className="w-full h-full rounded-full border border-red-500/60 flex flex-col items-center justify-center text-[8px] sm:text-[9px] font-mono font-black text-red-700 uppercase leading-none">
                     <span>★ GLOBAL ★</span>
@@ -165,61 +163,54 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
               </div>
             </div>
 
-            {/* Center: Wax Seal, Perforated Rip Line & Unseal Action Button */}
-            <div className="my-auto py-6 relative z-30 text-center space-y-4 sm:space-y-5">
-              {/* The Perforated Tear Line running horizontally across the envelope */}
-              <div className="relative py-2 max-w-2xl mx-auto flex items-center justify-center">
-                <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#b45309_0px,#b45309_8px,transparent_8px,transparent_16px)] opacity-60" />
-
-                {/* Animated Scissors slicing during unseal */}
-                {isTearingEnvelope && (
-                  <div className="absolute inset-0 flex items-center pointer-events-none">
-                    <div className="absolute inset-0 animate-tear-glow bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
-                    <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#d97706_0px,#d97706_8px,transparent_8px,transparent_16px)] animate-tear-strip" />
-                    <div className="absolute top-1/2 -translate-y-1/2 text-3xl sm:text-4xl animate-tear-scissor filter drop-shadow-[0_0_12px_rgba(245,158,11,1)]">
-                      ✂️
-                    </div>
+            {/* Center Hero: Wax Seal & Action Button */}
+            <div className="my-auto py-6 relative z-30 flex flex-col items-center justify-center text-center space-y-4 max-w-xl mx-auto w-full">
+              {/* Animated Scissor Tearing Line across center during unsealing */}
+              {isTearingEnvelope && (
+                <div className="absolute inset-x-[-40px] top-1/2 -translate-y-1/2 h-10 flex items-center pointer-events-none z-40">
+                  <div className="absolute inset-0 animate-tear-glow bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
+                  <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#d97706_0px,#d97706_8px,transparent_8px,transparent_16px)] animate-tear-strip" />
+                  <div className="absolute top-1/2 -translate-y-1/2 text-3xl sm:text-4xl animate-tear-scissor filter drop-shadow-[0_0_12px_rgba(245,158,11,1)]">
+                    ✂️
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* Red Wax Seal Button */}
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={handleUnsealEnvelope}
-                  disabled={isTearingEnvelope}
-                  className="relative group cursor-pointer focus:outline-none transition-transform hover:scale-105 active:scale-95"
-                  title="Nhấn để xé niêm phong mở thư"
-                >
-                  {/* Wax Seal Ribbon Tails */}
-                  <div className="absolute top-10 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none -z-10">
-                    <div className="w-3.5 h-14 bg-gradient-to-b from-red-700 to-red-900 -rotate-12 shadow-sm rounded-b-xs" />
-                    <div className="w-3.5 h-14 bg-gradient-to-b from-red-700 to-red-900 rotate-12 shadow-sm rounded-b-xs" />
-                  </div>
+              {/* 3D Crimson Red Wax Seal Button */}
+              <button
+                type="button"
+                onClick={handleUnsealEnvelope}
+                disabled={isTearingEnvelope}
+                className="relative group cursor-pointer focus:outline-none transition-transform hover:scale-105 active:scale-95"
+                title="Nhấn để xé niêm phong mở thư"
+              >
+                {/* Wax Seal Ribbon Tails */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none -z-10">
+                  <div className="w-3.5 h-12 bg-gradient-to-b from-red-700 to-red-900 -rotate-12 shadow-sm rounded-b-xs" />
+                  <div className="w-3.5 h-12 bg-gradient-to-b from-red-700 to-red-900 rotate-12 shadow-sm rounded-b-xs" />
+                </div>
 
-                  {/* 3D Wax Seal Circle */}
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-900 p-1 shadow-lg border-2 border-amber-300/80 flex flex-col items-center justify-center animate-seal-pulse">
-                    <div className="w-full h-full rounded-full border border-dashed border-amber-200/50 flex flex-col items-center justify-center text-amber-100">
-                      <span className="text-2xl sm:text-3xl select-none group-hover:rotate-12 transition-transform">🎄</span>
-                      <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-amber-200 mt-0.5">TOP SECRET</span>
-                    </div>
+                {/* 3D Wax Seal Circle */}
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-900 p-1 shadow-lg border-2 border-amber-300/80 flex flex-col items-center justify-center animate-seal-pulse">
+                  <div className="w-full h-full rounded-full border border-dashed border-amber-200/50 flex flex-col items-center justify-center text-amber-100">
+                    <span className="text-2xl sm:text-3xl select-none group-hover:rotate-12 transition-transform">🎄</span>
+                    <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-amber-200 mt-0.5">TOP SECRET</span>
                   </div>
-                </button>
-              </div>
+                </div>
+              </button>
 
               {/* Envelope Headline */}
-              <div className="space-y-1">
+              <div className="space-y-1 pt-1">
                 <h2 className="font-script font-bold text-3xl sm:text-5xl text-[#1e3a8a] drop-shadow-xs">
                   Bức Thư Mời Niêm Phong ❄️
                 </h2>
-                <p className="text-xs sm:text-sm text-stone-600 font-medium max-w-md mx-auto">
+                <p className="text-xs sm:text-sm text-stone-600 font-medium">
                   Phong bì chứa mật mã và thẻ tham gia sự kiện Secret Santa 2026 dành cho bạn.
                 </p>
               </div>
 
               {/* Action Button */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="button"
                   onClick={handleUnsealEnvelope}
@@ -227,17 +218,14 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                   className="btn-shimmer group relative mx-auto py-3.5 sm:py-4 px-6 sm:px-10 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/35 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-3 select-none"
                 >
                   <span className="text-xl sm:text-2xl group-hover:rotate-12 transition-transform">✂️</span>
-                  <span>{isTearingEnvelope ? "ĐANG XÉ PHONG BÌ..." : "BẤM VÀO ĐÂY ĐỂ XÉ PHONG BÌ"}</span>
+                  <span>{isTearingEnvelope ? "ĐANG XÉ PHONG BÌ..." : "XÉ PHONG BÌ & MỞ BƯU THIẾP"}</span>
                   <span className="text-xl sm:text-2xl animate-bounce">💌</span>
                 </button>
-                <p className="text-xs text-stone-500 mt-2 font-medium">
-                  👆 Bấm vào con dấu hoặc nút để bóc thư và mở bưu thiếp!
-                </p>
               </div>
             </div>
 
             {/* Bottom Bar: Vintage Envelope Address Lines */}
-            <div className="border-t border-dashed border-stone-300 pt-3 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-stone-600 relative z-20 gap-2">
+            <div className="border-t border-stone-200/90 pt-3 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-stone-600 relative z-20 gap-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="font-bold italic text-stone-800">from:</span>
                 <span className="font-black text-red-700 uppercase tracking-wider">{companyName}</span>
