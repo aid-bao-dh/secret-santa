@@ -96,9 +96,12 @@ export default async function HomePage() {
         </header>
 
         {/* Unbox Form Section */}
-        <section className="relative z-20">
+        <section id="unbox-section" className="relative z-20">
           <RevealOnScroll delay={80}>
-            <UnboxForm />
+            <UnboxForm
+              companyName={settings.companyName || "GLOBAL SAFE"}
+              companyLogo={settings.companyLogo || "/assets/logo.png"}
+            />
           </RevealOnScroll>
         </section>
 

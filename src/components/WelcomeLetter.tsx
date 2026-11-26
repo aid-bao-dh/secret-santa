@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { ArrowRight, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 
@@ -45,7 +45,7 @@ export function playChristmasChime() {
   }
 }
 
-function playJingleBellsMelody() {
+export function playJingleBellsMelody() {
   try {
     const AudioCtx =
       window.AudioContext ||
@@ -86,7 +86,7 @@ function playJingleBellsMelody() {
   }
 }
 
-function fireGrandConfetti() {
+export function fireGrandConfetti() {
   const colors = ["#dc2626", "#16a34a", "#facc15", "#ffffff", "#fb7185"];
   confetti({
     particleCount: 65,
@@ -132,15 +132,6 @@ const WELCOME_FLAKES = Array.from({ length: 16 }, (_, i) => ({
 
 type WelcomeStage = "sealed" | "unsealing" | "letter" | "exiting";
 
-function subscribeWelcomeStorage(callback: () => void) {
-  window.addEventListener("storage", callback);
-  window.addEventListener("gs-welcome-storage", callback);
-  return () => {
-    window.removeEventListener("storage", callback);
-    window.removeEventListener("gs-welcome-storage", callback);
-  };
-}
-
 export default function WelcomeLetter({
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
@@ -149,19 +140,15 @@ export default function WelcomeLetter({
 }: WelcomeLetterProps) {
   const revealDayLabel = formatDayMonth(revealDate, "27/11");
   const eventDayLabel = formatDayMonth(eventDate, "24/12");
-  const shouldAutoOpen = useSyncExternalStore(
-    subscribeWelcomeStorage,
-    () => !sessionStorage.getItem("gs_welcome_letter_seen"),
-    () => false
-  );
-  const [forceOpen, setForceOpen] = useState(false);
+  // Default to closed so users land directly on the Home page & login form
+  const [isOpen, setIsOpen] = useState(false);
   const [stage, setStage] = useState<WelcomeStage>("sealed");
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
     const handleReopen = () => {
       setStage("sealed");
-      setForceOpen(true);
+      setIsOpen(true);
     };
     window.addEventListener("reopen-welcome-letter", handleReopen);
     return () => window.removeEventListener("reopen-welcome-letter", handleReopen);
@@ -191,21 +178,21 @@ export default function WelcomeLetter({
     fireGrandConfetti();
 
     setTimeout(() => {
-      sessionStorage.setItem("gs_welcome_letter_seen", "true");
-      window.dispatchEvent(new Event("gs-welcome-storage"));
-      setForceOpen(false);
+      setIsOpen(false);
       setStage("sealed");
+      const unboxEl = document.getElementById("unbox-section");
+      if (unboxEl) {
+        unboxEl.scrollIntoView({ behavior: "smooth" });
+      }
     }, 450);
   };
 
   const handleSkip = () => {
-    sessionStorage.setItem("gs_welcome_letter_seen", "true");
-    window.dispatchEvent(new Event("gs-welcome-storage"));
-    setForceOpen(false);
+    setIsOpen(false);
     setStage("sealed");
   };
 
-  if (!shouldAutoOpen && !forceOpen) {
+  if (!isOpen) {
     return null;
   }
 
@@ -286,23 +273,23 @@ export default function WelcomeLetter({
         {/* STAGE 1: SMOOTH FLOATING SEALED ENVELOPE */}
         {(stage === "sealed" || stage === "unsealing") && (
           <div
-            className={`relative w-full max-w-md animate-pop-in transition-all duration-500 ease-out ${
+            className={`relative w-full max-w-lg mx-auto animate-pop-in transition-all duration-500 ease-out ${
               stage === "unsealing" ? "opacity-0 scale-105 -translate-y-4" : "opacity-100 scale-100"
             }`}
           >
             {/* Header Banner above envelope */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-6 px-2">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-300/20 border border-amber-200/45 text-amber-100 text-xs font-extrabold tracking-wider uppercase shadow-md">
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
                 <span>{companyName} • Secret Santa 2026</span>
               </span>
-              <h2 className="text-2xl sm:text-3xl font-holiday font-black text-white mt-3 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
-                Bạn Có Một Thư Mời Giáng Sinh! ✉️
+              <h2 className="text-2xl sm:text-3xl font-holiday font-black text-white mt-3 text-balance drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+                Món Quà Bất Ngờ Đang Chờ Bạn ✨
               </h2>
             </div>
 
             {/* Clean Floating Envelope Card (Zero 3D compositing glitch) */}
-            <div className={stage === "sealed" ? "animate-envelope-float" : ""}>
+            <div className={`max-w-md mx-auto ${stage === "sealed" ? "animate-envelope-float" : ""}`}>
               <div
                 onClick={handleBreakSeal}
                 role="button"

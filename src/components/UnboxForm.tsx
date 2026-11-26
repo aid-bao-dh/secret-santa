@@ -22,7 +22,15 @@ interface RevealData {
   wasViewedBefore?: boolean;
 }
 
-export default function UnboxForm() {
+interface UnboxFormProps {
+  companyName?: string;
+  companyLogo?: string;
+}
+
+export default function UnboxForm({
+  companyName = "GLOBAL SAFE",
+  companyLogo = "/assets/logo.png",
+}: UnboxFormProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -237,6 +245,8 @@ export default function UnboxForm() {
       {revealData && (
         <RevealModal
           data={revealData}
+          companyName={companyName}
+          companyLogo={companyLogo}
           onClose={() => setRevealData(null)}
         />
       )}
