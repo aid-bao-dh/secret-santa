@@ -263,11 +263,11 @@ export default function ChristmasPostcard({
                 </div>
 
                 {/* From line (Clean, fitted on one line without breaking) */}
-                <div className="mb-4 sm:mb-5 pb-2.5 sm:pb-3 border-b-2 border-stone-300 flex items-baseline gap-2 sm:gap-2.5">
-                  <span className="font-bold text-lg sm:text-xl text-stone-600 shrink-0 italic">
+                <div className="mb-4 sm:mb-5 pb-2.5 sm:pb-3 border-b-2 border-stone-300 flex items-baseline gap-2.5">
+                  <span className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">
                     from:
                   </span>
-                  <span className="font-black text-lg sm:text-xl md:text-2xl text-red-700 uppercase tracking-wider drop-shadow-xs whitespace-nowrap">
+                  <span className="font-black text-xl sm:text-2xl text-red-700 uppercase tracking-wider drop-shadow-xs whitespace-nowrap">
                     {companyName}
                   </span>
                 </div>
@@ -276,8 +276,8 @@ export default function ChristmasPostcard({
                 {currentUser ? (
                   <div className="space-y-4 my-2 animate-fade-up">
                     <div className="pt-1">
-                      <div className="flex items-baseline gap-2 mb-1.5">
-                        <span className="font-bold text-xl sm:text-2xl text-stone-700 italic">
+                      <div className="flex items-baseline gap-2.5 mb-1.5">
+                        <span className="font-bold text-xl sm:text-2xl text-stone-800 italic">
                           to:
                         </span>
                         <span className="text-[11px] font-bold text-red-600 uppercase tracking-widest bg-red-100/90 px-2.5 py-0.5 rounded-full border border-red-200">
@@ -327,8 +327,8 @@ export default function ChristmasPostcard({
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {/* To Line (Email công ty) */}
                     <div>
-                      <div className="flex items-baseline gap-2 mb-1">
-                        <label htmlFor="postcard-email" className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
+                      <div className="flex items-baseline gap-2.5 mb-1">
+                        <label htmlFor="postcard-email" className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">
                           to:
                         </label>
                         <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
@@ -352,8 +352,8 @@ export default function ChristmasPostcard({
 
                     {/* Pass Line (4 số cuối điện thoại) */}
                     <div className="pt-1">
-                      <div className="flex items-baseline gap-2 mb-1">
-                        <label htmlFor="postcard-pass" className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
+                      <div className="flex items-baseline gap-2.5 mb-1">
+                        <label htmlFor="postcard-pass" className="font-bold text-xl sm:text-2xl text-stone-800 shrink-0 italic">
                           pass:
                         </label>
                         <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
