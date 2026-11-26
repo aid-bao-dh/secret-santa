@@ -4,12 +4,13 @@ import { Gift, ShieldCheck, HeartHandshake, AlertTriangle } from "lucide-react";
 
 interface RulesSectionProps {
   customRules?: string;
+  className?: string;
 }
 
-export default function RulesSection({ customRules }: RulesSectionProps) {
+export default function RulesSection({ customRules, className = "" }: RulesSectionProps) {
   return (
-    <section className="my-8 max-w-4xl mx-auto px-4">
-      <div className="bg-white/95 border-2 border-emerald-600/30 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-[0_15px_35px_rgba(0,0,0,0.06)] relative overflow-hidden">
+    <section className={`w-full ${className}`}>
+      <div className="bg-white/95 border-2 border-emerald-600/30 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-[0_15px_35px_rgba(0,0,0,0.06)] relative overflow-hidden h-full flex flex-col justify-between">
         
         {/* Decorative corner greenery */}
         <div className="absolute top-0 right-0 text-4xl opacity-40 pointer-events-none p-3">🎄</div>

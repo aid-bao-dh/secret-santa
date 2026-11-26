@@ -25,11 +25,13 @@ interface RevealData {
 interface UnboxFormProps {
   companyName?: string;
   companyLogo?: string;
+  className?: string;
 }
 
 export default function UnboxForm({
   companyName = "GLOBAL SAFE",
   companyLogo = "/assets/logo.png",
+  className = "",
 }: UnboxFormProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
@@ -93,7 +95,7 @@ export default function UnboxForm({
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto my-6 pt-4 px-4">
+    <div className={`w-full max-w-lg mx-auto ${className}`}>
       {/* 3D Festive Gift Box Hero */}
       <div className="text-center mb-6">
         <div
@@ -219,6 +221,18 @@ export default function UnboxForm({
             <span>{notMatchedMsg}</span>
           </div>
         )}
+
+        {/* Quick Rule Tag */}
+        <div className="px-3.5 py-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-center justify-between text-xs text-amber-950 font-semibold shadow-xs">
+          <span className="flex items-center gap-1.5">
+            <span className="text-base">🎁</span>
+            <span>Ngân sách: <strong className="text-red-700 font-bold">Dưới 200.000đ</strong> (tự do chọn quà)</span>
+          </span>
+          <span className="text-emerald-700 flex items-center gap-1 shrink-0">
+            <span>🤫</span>
+            <span>Giữ bí mật</span>
+          </span>
+        </div>
 
         {/* Submit Button */}
         <button

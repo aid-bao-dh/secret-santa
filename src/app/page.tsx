@@ -95,20 +95,23 @@ export default async function HomePage() {
           </div>
         </header>
 
-        {/* Unbox Form Section */}
-        <section id="unbox-section" className="relative z-20">
+        {/* Main Interactive Hub: Event Rules & Login Form */}
+        <section id="unbox-section" className="max-w-6xl mx-auto px-4 my-6 sm:my-10 relative z-20">
           <RevealOnScroll delay={80}>
-            <UnboxForm
-              companyName={settings.companyName || "GLOBAL SAFE"}
-              companyLogo={settings.companyLogo || "/assets/logo.png"}
-            />
-          </RevealOnScroll>
-        </section>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Event Rules (7 cols on desktop) */}
+              <div className="lg:col-span-7 w-full order-2 lg:order-1">
+                <RulesSection customRules={settings.rules} />
+              </div>
 
-        {/* Rules Section */}
-        <section className="relative z-20">
-          <RevealOnScroll delay={100}>
-            <RulesSection customRules={settings.rules} />
+              {/* Login / Unbox Form (5 cols on desktop) */}
+              <div className="lg:col-span-5 w-full order-1 lg:order-2">
+                <UnboxForm
+                  companyName={settings.companyName || "GLOBAL SAFE"}
+                  companyLogo={settings.companyLogo || "/assets/logo.png"}
+                />
+              </div>
+            </div>
           </RevealOnScroll>
         </section>
 
