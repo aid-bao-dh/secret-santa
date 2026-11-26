@@ -80,10 +80,10 @@ export default function ChristmasPostcard({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-4 sm:py-8">
+    <div className="w-full max-w-4xl mx-auto p-0 sm:px-2 py-1 sm:py-4">
       {/* Outer Airmail Diagonal Striped Border (Matches user's postcard inspiration) */}
       <div
-        className="relative w-full rounded-[32px] p-3 sm:p-5 shadow-[0_25px_70px_rgba(0,0,0,0.35)] transition-all duration-300"
+        className="relative w-full rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-4 shadow-[0_25px_70px_rgba(0,0,0,0.35)] transition-all duration-300"
         style={{
           background: `repeating-linear-gradient(
             -45deg,
@@ -99,12 +99,12 @@ export default function ChristmasPostcard({
         }}
       >
         {/* Inner Parchment Card Body */}
-        <div className="relative w-full bg-[#fcf9f2] rounded-[24px] p-6 sm:p-9 shadow-inner border border-amber-900/10 text-stone-800 overflow-hidden">
+        <div className="relative w-full bg-[#fcf9f2] rounded-[18px] sm:rounded-[24px] p-4 sm:p-7 md:p-8 shadow-inner border border-amber-900/10 text-stone-800 overflow-hidden">
           {/* Subtle Vintage Texture Accent */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#78350f_1px,transparent_1px)] [background-size:16px_16px]" />
 
           {/* Grid Layout: Left (Merry Christmas & Rules) + Right (Stamp, To, From, Login Inputs) */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-7 md:gap-8 items-stretch relative z-10">
             {/* ========================================================================= */}
             {/* LEFT HALF: "Merry Christmas" + Illustrations + Thể Lệ Cuộc Chơi          */}
             {/* ========================================================================= */}
@@ -226,23 +226,29 @@ export default function ChristmasPostcard({
                   </div>
                 </div>
 
-                {/* From line (Enlarged prominent company branding) */}
-                <div className="mb-5 pb-3.5 border-b-2 border-stone-300 flex items-center justify-between gap-3">
-                  <div className="flex items-baseline gap-2.5">
-                    <span className="font-holiday font-bold text-3xl sm:text-4xl text-stone-700">
-                      from:
-                    </span>
-                    <span className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 uppercase tracking-wider drop-shadow-sm">
-                      {companyName}
-                    </span>
+                {/* From line (Responsive & Never Overflows) */}
+                <div className="mb-4 sm:mb-5 pb-3 border-b-2 border-stone-300">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                        <span className="font-holiday font-bold text-2xl sm:text-3xl text-stone-700 shrink-0">
+                          from:
+                        </span>
+                        <span className="font-black text-xl sm:text-2xl md:text-3xl text-red-700 uppercase tracking-wide drop-shadow-xs truncate max-w-full">
+                          {companyName}
+                        </span>
+                      </div>
+                    </div>
+                    {companyLogo && (
+                      <div className="shrink-0 pl-1">
+                        <img
+                          src={companyLogo}
+                          alt={companyName}
+                          className="h-7 sm:h-8 md:h-9 w-auto max-w-[75px] sm:max-w-[110px] object-contain drop-shadow-xs"
+                        />
+                      </div>
+                    )}
                   </div>
-                  {companyLogo && (
-                    <img
-                      src={companyLogo}
-                      alt={companyName}
-                      className="h-9 sm:h-12 w-auto max-w-[150px] object-contain drop-shadow-xs"
-                    />
-                  )}
                 </div>
 
                 {/* If already logged in: Display recipient name BIG and personal */}
@@ -250,7 +256,7 @@ export default function ChristmasPostcard({
                   <div className="space-y-4 my-2 animate-fade-up">
                     <div className="pt-1">
                       <div className="flex items-baseline gap-2 mb-1.5">
-                        <span className="font-holiday font-bold text-3xl sm:text-4xl text-stone-700">
+                        <span className="font-holiday font-bold text-2xl sm:text-3xl text-stone-700">
                           to:
                         </span>
                         <span className="text-[11px] font-bold text-red-600 uppercase tracking-widest bg-red-100/90 px-2.5 py-0.5 rounded-full border border-red-200">
@@ -258,8 +264,8 @@ export default function ChristmasPostcard({
                         </span>
                       </div>
 
-                      <div className="pl-4 sm:pl-5 border-l-4 sm:border-l-6 border-red-600 bg-gradient-to-r from-red-50/95 via-amber-50/70 to-white/90 py-3.5 px-4 rounded-r-2xl shadow-sm border border-l-0 border-amber-200/60">
-                        <h3 className="font-holiday font-black text-4xl sm:text-5xl md:text-6xl text-red-700 leading-tight tracking-wide drop-shadow-xs">
+                      <div className="pl-3.5 sm:pl-5 border-l-4 sm:border-l-6 border-red-600 bg-gradient-to-r from-red-50/95 via-amber-50/70 to-white/90 py-3 px-3.5 sm:px-4 rounded-r-2xl shadow-sm border border-l-0 border-amber-200/60">
+                        <h3 className="font-holiday font-black text-3xl sm:text-4xl md:text-5xl text-red-700 leading-tight tracking-wide drop-shadow-xs break-words">
                           {currentUser.name}
                         </h3>
                         <div className="flex flex-wrap items-center gap-2 mt-2">

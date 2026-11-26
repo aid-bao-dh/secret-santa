@@ -40,10 +40,19 @@ function subscribeSession(callback: () => void) {
   };
 }
 
+let cachedRawUser: string | null = null;
+let cachedUserData: RevealData | null = null;
+
 function getStoredUser(): RevealData | null {
   try {
+    if (typeof window === "undefined") return null;
     const raw = sessionStorage.getItem("ss_user_data");
-    return raw ? JSON.parse(raw) : null;
+    if (raw === cachedRawUser) {
+      return cachedUserData;
+    }
+    cachedRawUser = raw;
+    cachedUserData = raw ? (JSON.parse(raw) as RevealData) : null;
+    return cachedUserData;
   } catch {
     return null;
   }
@@ -51,6 +60,7 @@ function getStoredUser(): RevealData | null {
 
 function getStoredStep(): FlowStep {
   try {
+    if (typeof window === "undefined") return "login";
     const saved = sessionStorage.getItem("ss_flow_step") as FlowStep | null;
     return saved === "event" ? "event" : "login";
   } catch {
@@ -90,7 +100,10 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
 
   const handleLoginSuccess = (data: RevealData) => {
     try {
-      sessionStorage.setItem("ss_user_data", JSON.stringify(data));
+      const raw = JSON.stringify(data);
+      cachedRawUser = raw;
+      cachedUserData = data;
+      sessionStorage.setItem("ss_user_data", raw);
       sessionStorage.setItem("ss_flow_step", "event");
       window.dispatchEvent(new Event("ss-session-change"));
     } catch {
@@ -101,6 +114,8 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
 
   const handleLogout = () => {
     try {
+      cachedRawUser = null;
+      cachedUserData = null;
       sessionStorage.removeItem("ss_user_data");
       sessionStorage.removeItem("ss_flow_step");
       window.dispatchEvent(new Event("ss-session-change"));
