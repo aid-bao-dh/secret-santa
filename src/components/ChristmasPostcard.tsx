@@ -288,21 +288,22 @@ export default function ChristmasPostcard({
                         <h3 className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 leading-tight tracking-tight drop-shadow-xs break-words">
                           {currentUser.name}
                         </h3>
-                        <div className="flex flex-wrap items-center gap-2 mt-2">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs sm:text-sm font-bold border border-emerald-300 shadow-xs">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs sm:text-sm font-bold border border-emerald-300 shadow-xs max-w-full">
                             <span>🏢</span>
-                            <span>Phòng {currentUser.department}</span>
+                            <span className="truncate">Phòng {currentUser.department}</span>
                           </span>
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-stone-100 text-stone-600 rounded-lg text-xs font-mono border border-stone-200">
-                            ✉️ {currentUser.email}
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-stone-100 text-stone-600 rounded-lg text-xs font-mono border border-stone-200 max-w-full">
+                            <span>✉️</span>
+                            <span className="truncate">{currentUser.email}</span>
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-100/90 border border-emerald-300 rounded-xl text-emerald-800 text-xs sm:text-sm font-bold shadow-xs">
-                      <span>✅</span>
-                      <span>ĐÃ XÁC THỰC THÀNH VIÊN {companyName}</span>
+                    <div className="inline-flex max-w-full items-center gap-2 px-3 sm:px-3.5 py-1.5 bg-emerald-100/90 border border-emerald-300 rounded-xl text-emerald-800 text-xs sm:text-sm font-bold shadow-xs">
+                      <span className="shrink-0">✅</span>
+                      <span className="truncate">ĐÃ XÁC THỰC THÀNH VIÊN {companyName}</span>
                     </div>
 
                     <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/90">

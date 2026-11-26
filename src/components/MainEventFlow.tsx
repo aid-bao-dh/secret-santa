@@ -140,16 +140,16 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
   }
 
   return (
-    <main className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+    <main className="min-h-screen relative overflow-x-hidden w-full flex flex-col justify-between">
       {/* REOPENED POSTCARD MODAL (WHEN VIEWING FROM EVENT HUB) */}
       {isReopeningPostcard && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in"
+          className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsReopeningPostcard(false);
           }}
         >
-          <div className="relative w-[95vw] sm:w-[90vw] max-w-6xl my-auto">
+          <div className="relative w-full sm:w-[90vw] max-w-6xl my-auto">
             <button
               onClick={() => setIsReopeningPostcard(false)}
               className="absolute -top-3 -right-2 z-50 p-2.5 rounded-full bg-white text-stone-800 shadow-xl hover:bg-stone-100 transition cursor-pointer border border-stone-200"
@@ -211,8 +211,8 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
         {/* SCREEN 1: BƯU THIẾP GIÁNG SINH (POSTCARD) — MỞ MODAL RA KHI VÀO TRANG, KHÔNG CÓ NÚT TẮT */}
         {/* ========================================================================= */}
         {step === "login" && (
-          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in">
-            <div className="relative w-[95vw] sm:w-[90vw] max-w-6xl my-auto">
+          <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in">
+            <div className="relative w-full sm:w-[90vw] max-w-6xl my-auto">
               <ChristmasPostcard
                 companyName={companyName}
                 companyLogo={companyLogo}
@@ -227,9 +227,9 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
         {/* SCREEN 2: PHẦN MỞ HỘP CÓ THÔNG TIN ĐẾM NGƯỢC (EVENT HUB)                  */}
         {/* ========================================================================= */}
         {step === "event" && userData && (
-          <div className="animate-fade-up">
+          <div className="animate-fade-up w-full overflow-x-hidden">
             {/* Main Hero Header */}
-            <header className="pt-8 sm:pt-12 pb-4 text-center px-4 relative z-20 max-w-4xl mx-auto">
+            <header className="pt-8 sm:pt-12 pb-4 text-center px-3 sm:px-4 relative z-20 max-w-4xl mx-auto w-full">
               <span
                 className="hidden lg:block absolute left-2 top-14 text-3xl opacity-70 animate-float-slow select-none pointer-events-none"
                 aria-hidden="true"
@@ -244,17 +244,19 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
               </span>
 
               {/* Greeting Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-6">
-                <span className="text-base">🎅</span>
-                <span>CHÀO BẠN: {userData.currentUser.name.toUpperCase()} • PHÒNG {userData.currentUser.department}</span>
-                <span className="text-base">✨</span>
+              <div className="inline-flex max-w-full flex-wrap justify-center items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 bg-red-600 border-2 border-emerald-600 rounded-2xl sm:rounded-full text-xs sm:text-sm font-bold text-white shadow-md mb-6 text-center leading-snug">
+                <span className="text-base shrink-0">🎅</span>
+                <span className="break-words">
+                  CHÀO BẠN: {userData.currentUser.name.toUpperCase()} • PHÒNG {userData.currentUser.department}
+                </span>
+                <span className="text-base shrink-0">✨</span>
               </div>
 
-              <h1 className="text-3xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-500 to-emerald-700 animate-gradient-flow drop-shadow-xs leading-tight sm:leading-tight mb-4">
+              <h1 className="text-2xl min-[380px]:text-3xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-500 to-emerald-700 animate-gradient-flow drop-shadow-xs leading-tight sm:leading-tight mb-4 break-words">
                 MÙA NOEL NÀY, BẠN LÀ SANTA CỦA AI?
               </h1>
 
-              <p className="text-stone-700 text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-6 font-medium">
+              <p className="text-stone-700 text-xs sm:text-base max-w-xl mx-auto leading-relaxed mb-6 font-medium px-2">
                 Mở hộp quà bí mật từ Bắc Cực, trao gửi món quà yêu thương (ngân sách dưới 200.000đ) và cùng thử tài thám tử giải mã danh tính Santa của bạn! ✨🎁
               </p>
 
@@ -265,9 +267,9 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
             </header>
 
             {/* INTERACTIVE GIFT BOX SECTION (PHẦN MỞ HỘP QUÀ) */}
-            <section className="max-w-xl mx-auto px-4 my-8 relative z-20 text-center">
+            <section className="max-w-xl mx-auto px-3 sm:px-4 my-8 relative z-20 text-center w-full">
               <RevealOnScroll delay={80}>
-                <div className="bg-white/95 border-2 border-red-500/35 rounded-3xl p-6 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.08)] backdrop-blur-md relative overflow-hidden">
+                <div className="bg-white/95 border-2 border-red-500/35 rounded-3xl p-4 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.08)] backdrop-blur-md relative overflow-hidden">
                   {/* Decorative Sparkles */}
                   <div className="absolute top-3 left-4 text-2xl select-none animate-float-slow">✨</div>
                   <div className="absolute top-3 right-4 text-2xl select-none animate-float-reverse">❄️</div>
@@ -288,18 +290,18 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
                     title="Chạm nhẹ để mở thẻ nhiệm vụ!"
                   >
                     <div className="absolute inset-0 bg-red-400/30 rounded-full blur-2xl -z-10" />
-                    <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-br from-red-500 via-rose-600 to-red-800 shadow-[0_18px_36px_rgba(220,38,38,0.4)] border-3 border-amber-300 flex items-center justify-center relative">
-                      <div className="absolute inset-y-0 w-8 bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 shadow-sm" />
-                      <div className="absolute inset-x-0 h-8 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 shadow-sm" />
-                      <div className="absolute -top-5 text-5xl filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">🎀</div>
-                      <Gift className="w-14 h-14 text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
+                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-br from-red-500 via-rose-600 to-red-800 shadow-[0_18px_36px_rgba(220,38,38,0.4)] border-3 border-amber-300 flex items-center justify-center relative">
+                      <div className="absolute inset-y-0 w-7 sm:w-8 bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-500 shadow-sm" />
+                      <div className="absolute inset-x-0 h-7 sm:h-8 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 shadow-sm" />
+                      <div className="absolute -top-5 text-4xl sm:text-5xl filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">🎀</div>
+                      <Gift className="w-12 h-12 sm:w-14 sm:h-14 text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
                       <div className="absolute -bottom-3 -right-2 bg-emerald-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-md border border-emerald-300 rotate-[-6deg] flex items-center gap-1">
                         <span>🏷️ Mở Quà</span>
                       </div>
                     </div>
                   </div>
 
-                  <h3 className="text-2xl sm:text-3xl font-holiday font-bold text-red-800 mt-4 drop-shadow-sm">
+                  <h3 className="text-xl sm:text-3xl font-holiday font-bold text-red-800 mt-4 drop-shadow-sm break-words">
                     Hộp Quà Của {userData.currentUser.name} 🎁
                   </h3>
 
@@ -314,21 +316,21 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
                         playChristmasChime();
                         setIsModalOpen(true);
                       }}
-                      className="btn-shimmer w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-red-600/30 transition-all hover:-translate-y-0.5 active:scale-98 border-2 border-amber-200 cursor-pointer flex items-center justify-center gap-2.5"
+                      className="btn-shimmer w-full py-3.5 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-xs min-[360px]:text-sm sm:text-lg rounded-2xl shadow-xl shadow-red-600/30 transition-all hover:-translate-y-0.5 active:scale-98 border-2 border-amber-200 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
                     >
-                      <Gift className="w-5 h-5 text-yellow-200" />
-                      <span>BẤM ĐỂ MỞ HỘP QUÀ / XEM THẺ NHIỆM VỤ</span>
-                      <ArrowRight className="w-5 h-5" />
+                      <Gift className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-200 shrink-0" />
+                      <span className="truncate">BẤM ĐỂ MỞ HỘP QUÀ / XEM THẺ NHIỆM VỤ</span>
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                     </button>
 
                     {/* Quick Guide Tag */}
-                    <div className="px-4 py-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-center justify-between text-xs text-amber-950 font-semibold shadow-xs">
+                    <div className="px-3 sm:px-4 py-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-1.5 text-xs text-amber-950 font-semibold shadow-xs text-center sm:text-left">
                       <span className="flex items-center gap-1.5">
-                        <span className="text-base">🎁</span>
+                        <span className="text-base shrink-0">🎁</span>
                         <span>Ngân sách: <strong className="text-red-700 font-bold">Dưới 200.000đ</strong> (tự do chọn quà)</span>
                       </span>
                       <span className="text-emerald-700 flex items-center gap-1 shrink-0">
-                        <ShieldCheck className="w-4 h-4" />
+                        <ShieldCheck className="w-4 h-4 shrink-0" />
                         <span>Giữ bí mật</span>
                       </span>
                     </div>

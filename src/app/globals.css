@@ -12,11 +12,19 @@
   --font-script: var(--font-dancing), 'Dancing Script', cursive;
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   background-color: #fafaf9;
   color: #1c1917;
   font-family: var(--font-sans);
   overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
   /* Fresh, bright snowy winter atmosphere with soft holiday warmth */
   background-image: 
     radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),

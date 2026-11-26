@@ -76,11 +76,11 @@ export default function Countdown({
       : `Chào mừng Đêm Tiệc Giáng Sinh (${formatDayMonth(eventDate, "24/12")})`;
 
   return (
-    <div className="bg-white/95 border-2 border-red-500/40 rounded-3xl p-4 sm:p-6 backdrop-blur-md shadow-[0_10px_25px_rgba(220,38,38,0.12)] text-center max-w-xl mx-auto my-5 relative">
-      <div className="flex items-center justify-center gap-2 text-red-700 font-bold mb-3 text-sm sm:text-base tracking-wide">
-        <Sparkles className="w-5 h-5 text-amber-500 animate-spin shrink-0" style={{ animationDuration: "6s" }} />
-        <span>{activeLabel}</span>
-        <Sparkles className="w-5 h-5 text-amber-500 animate-spin shrink-0" style={{ animationDuration: "6s" }} />
+    <div className="bg-white/95 border-2 border-red-500/40 rounded-3xl p-3.5 sm:p-6 backdrop-blur-md shadow-[0_10px_25px_rgba(220,38,38,0.12)] text-center max-w-xl mx-auto my-5 relative overflow-hidden">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-red-700 font-bold mb-3 text-xs sm:text-base tracking-wide flex-wrap">
+        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 animate-spin shrink-0" style={{ animationDuration: "6s" }} />
+        <span className="break-words">{activeLabel}</span>
+        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 animate-spin shrink-0" style={{ animationDuration: "6s" }} />
       </div>
 
       {state.phase === "done" ? (
