@@ -262,29 +262,14 @@ export default function ChristmasPostcard({
                   </div>
                 </div>
 
-                {/* From line (Responsive & Never Overflows) */}
-                <div className="mb-4 sm:mb-5 pb-3 border-b-2 border-stone-300">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                        <span className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
-                          from:
-                        </span>
-                        <span className="font-black text-xl sm:text-2xl md:text-3xl text-red-700 uppercase tracking-wide drop-shadow-xs truncate max-w-full">
-                          {companyName}
-                        </span>
-                      </div>
-                    </div>
-                    {companyLogo && (
-                      <div className="shrink-0 pl-1">
-                        <img
-                          src={companyLogo}
-                          alt={companyName}
-                          className="h-7 sm:h-8 md:h-9 w-auto max-w-[75px] sm:max-w-[110px] object-contain drop-shadow-xs"
-                        />
-                      </div>
-                    )}
-                  </div>
+                {/* From line (Clean, bold & full width for company name) */}
+                <div className="mb-4 sm:mb-5 pb-3 border-b-2 border-stone-300 flex items-baseline gap-2.5 sm:gap-3">
+                  <span className="font-bold text-xl sm:text-2xl text-stone-700 shrink-0 italic">
+                    from:
+                  </span>
+                  <span className="font-black text-2xl sm:text-3xl md:text-4xl text-red-700 uppercase tracking-wider drop-shadow-xs">
+                    {companyName}
+                  </span>
                 </div>
 
                 {/* If already logged in: Display recipient name BIG and personal */}
