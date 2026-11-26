@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock } from "lucide-react";
-import { playJingleBellsMelody, fireGrandConfetti } from "./WelcomeLetter";
+import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock, ShieldAlert } from "lucide-react";
+import { playJingleBellsMelody, fireGrandConfetti, playSuspenseWarningSound } from "./WelcomeLetter";
 import { RevealData } from "./UnboxForm";
 
 interface ChristmasPostcardProps {
@@ -30,6 +30,9 @@ export default function ChristmasPostcard({
   const [phoneLast4, setPhoneLast4] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [pendingData, setPendingData] = useState<RevealData | null>(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [hasConfirmedAlone, setHasConfirmedAlone] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,15 +71,23 @@ export default function ChristmasPostcard({
         return;
       }
 
-      playJingleBellsMelody();
-      fireGrandConfetti();
-
-      onSuccess?.(data);
+      // Success: Play dramatic suspense radar alert & open Top Secret Warning Modal
+      playSuspenseWarningSound();
+      setPendingData(data);
+      setShowWarningModal(true);
     } catch {
       setErrorMsg("Có lỗi kết nối đến máy chủ. Vui lòng thử lại sau.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleConfirmAndProceed = () => {
+    if (!pendingData) return;
+    setShowWarningModal(false);
+    playJingleBellsMelody();
+    fireGrandConfetti();
+    onSuccess?.(pendingData);
   };
 
   return (
@@ -425,6 +436,117 @@ export default function ChristmasPostcard({
           </div>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* DRAMATIC TOP SECRET WARNING POPUP (CẢNH BÁO BẢO MẬT & XEM MỘT MÌNH)       */}
+      {/* ========================================================================= */}
+      {showWarningModal && pendingData && (
+        <div className="fixed inset-0 z-[100] bg-black/92 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 animate-pop-in">
+          {/* Dark Stealth Tactical Warning Container */}
+          <div className="relative w-full max-w-lg bg-[#0c0a09] border-2 border-red-600 rounded-3xl shadow-[0_0_80px_rgba(220,38,38,0.65)] overflow-hidden text-stone-100">
+            {/* Top Red-Black Caution Tape Bar */}
+            <div
+              className="h-3 w-full"
+              style={{
+                background: "repeating-linear-gradient(-45deg, #dc2626 0px, #dc2626 12px, #000 12px, #000 24px)",
+              }}
+            />
+
+            <div className="p-5 sm:p-8 space-y-5">
+              {/* Top Secret Badge */}
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/90 border border-red-500 text-red-400 text-xs font-black uppercase tracking-widest animate-pulse">
+                  <span className="text-base">🚨</span>
+                  <span>MẬT LỆNH BẢO MẬT CẤP ĐỘ CAO NHẤT</span>
+                </div>
+                <span className="text-xs font-mono text-stone-500 uppercase tracking-widest hidden sm:inline">
+                  TOP SECRET
+                </span>
+              </div>
+
+              {/* Dangerous Headline */}
+              <div className="space-y-1">
+                <h2 className="text-2xl sm:text-3xl font-black text-red-500 uppercase tracking-tight leading-tight flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>BẠN CÓ ĐANG Ở MỘT MÌNH KHÔNG?</span>
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-400 font-medium">
+                  (ARE YOU CURRENTLY VIEWING THIS ALONE?)
+                </p>
+              </div>
+
+              {/* Warning Checklist (Dramatic & Fun) */}
+              <div className="space-y-3 bg-red-950/40 border border-red-900/70 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm text-stone-200">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl shrink-0">👀</span>
+                  <p className="leading-snug">
+                    <strong className="text-white font-bold">Quan sát xung quanh ngay bây giờ:</strong> Hãy chắc chắn không có đồng nghiệp nào đang đứng sau lưng hoặc liếc nhìn màn hình của bạn!
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-xl shrink-0">🤫</span>
+                  <p className="leading-snug">
+                    <strong className="text-white font-bold">Nhiệm vụ tối mật:</strong> Sau cánh cửa này là danh tính người bạn sẽ tặng quà và 3 manh mối truy tìm Santa đang âm thầm tặng quà cho bạn.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-xl shrink-0">🎪</span>
+                  <p className="leading-snug">
+                    <strong className="text-amber-400 font-bold">Hình phạt sinh tử:</strong> Bất kỳ ai vô tình để lộ bí mật trước đêm tiệc Noel 24/12 sẽ bị bêu tên và chịu hình phạt tại <strong className="text-red-400 font-bold">Vòng Quay Phạt</strong> trước toàn thể {companyName}!
+                  </p>
+                </div>
+              </div>
+
+              {/* Interactive Confirm Checkbox */}
+              <label className="flex items-center gap-3 p-3.5 bg-stone-900/90 rounded-2xl border border-stone-800 cursor-pointer select-none hover:border-red-500/60 transition group">
+                <input
+                  type="checkbox"
+                  checked={hasConfirmedAlone}
+                  onChange={(e) => setHasConfirmedAlone(e.target.checked)}
+                  className="w-5 h-5 rounded accent-red-600 cursor-pointer shrink-0"
+                />
+                <span className="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-white transition">
+                  Tôi xác nhận đang ở một mình &amp; thề giữ bí mật tuyệt đối! ✋
+                </span>
+              </label>
+
+              {/* Actions */}
+              <div className="space-y-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={handleConfirmAndProceed}
+                  className="btn-shimmer group w-full py-4 px-6 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-[0_0_30px_rgba(220,38,38,0.55)] transition-all hover:scale-[1.01] active:scale-98 border-2 border-red-400 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <ShieldAlert className="w-5 h-5" />
+                  <span>TÔI ĐANG Ở MỘT MÌNH — MỞ THƯ NGAY 🔥</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowWarningModal(false);
+                    setPendingData(null);
+                  }}
+                  className="w-full py-2.5 text-center text-xs text-stone-400 hover:text-stone-200 transition font-medium cursor-pointer"
+                >
+                  Chờ chút, để tôi tìm góc kín đáo hơn... 🏃‍♂️
+                </button>
+              </div>
+            </div>
+
+            {/* Bottom Red-Black Caution Tape Bar */}
+            <div
+              className="h-3 w-full"
+              style={{
+                background: "repeating-linear-gradient(-45deg, #dc2626 0px, #dc2626 12px, #000 12px, #000 24px)",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

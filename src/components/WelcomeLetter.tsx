@@ -91,6 +91,40 @@ export function playJingleBellsMelody() {
   }
 }
 
+export function playSuspenseWarningSound() {
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    // Dramatic two-tone radar alert (A4 -> C#5 -> A4)
+    const tones = [
+      { freq: 440, delay: 0.0, dur: 0.15 },
+      { freq: 554.37, delay: 0.16, dur: 0.18 },
+      { freq: 440, delay: 0.36, dur: 0.25 },
+    ];
+
+    tones.forEach(({ freq, delay, dur }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      const start = ctx.currentTime + delay;
+      osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.24, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + dur + 0.05);
+    });
+  } catch (err) {
+    console.warn("Suspense warning sound skipped", err);
+  }
+}
+
 export function fireGrandConfetti() {
   const colors = ["#dc2626", "#16a34a", "#facc15", "#ffffff", "#fb7185"];
   confetti({
