@@ -144,12 +144,12 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
       {/* REOPENED POSTCARD MODAL (WHEN VIEWING FROM EVENT HUB) */}
       {isReopeningPostcard && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-pop-in"
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsReopeningPostcard(false);
           }}
         >
-          <div className="relative w-full max-w-4xl my-auto">
+          <div className="relative w-[95vw] sm:w-[90vw] max-w-6xl my-auto">
             <button
               onClick={() => setIsReopeningPostcard(false)}
               className="absolute -top-3 -right-2 z-50 p-2.5 rounded-full bg-white text-stone-800 shadow-xl hover:bg-stone-100 transition cursor-pointer border border-stone-200"
@@ -211,8 +211,8 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
         {/* SCREEN 1: BƯU THIẾP GIÁNG SINH (POSTCARD) — MỞ MODAL RA KHI VÀO TRANG, KHÔNG CÓ NÚT TẮT */}
         {/* ========================================================================= */}
         {step === "login" && (
-          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-pop-in">
-            <div className="relative w-full max-w-4xl my-auto">
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in">
+            <div className="relative w-[95vw] sm:w-[90vw] max-w-6xl my-auto">
               <ChristmasPostcard
                 companyName={companyName}
                 companyLogo={companyLogo}

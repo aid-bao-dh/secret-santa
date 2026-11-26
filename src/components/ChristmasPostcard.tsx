@@ -91,7 +91,7 @@ export default function ChristmasPostcard({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-0 sm:px-2 py-1 sm:py-4">
+    <div className="w-full max-w-6xl mx-auto p-0 sm:px-2 py-1 sm:py-4">
       {/* Outer Airmail Diagonal Striped Border (Matches user's postcard inspiration) */}
       <div
         className="relative w-full rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-4 shadow-[0_25px_70px_rgba(0,0,0,0.35)] transition-all duration-300"
