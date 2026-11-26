@@ -20,7 +20,6 @@ interface ChristmasPostcardProps {
 
 export default function ChristmasPostcard({
   companyName = "GLOBAL SAFE",
-  companyLogo = "/assets/logo.png",
   customRules,
   currentUser,
   onSuccess,
