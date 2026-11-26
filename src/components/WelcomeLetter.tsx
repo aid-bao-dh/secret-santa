@@ -59,22 +59,26 @@ export function playUnsealSound() {
     const ctx = new AudioCtx();
     const now = ctx.currentTime;
 
-    // 1. Crisp paper rustle / unsealing tearing sound (filtered noise)
-    const bufferSize = Math.floor(ctx.sampleRate * 0.22);
+    // 1. Crisp paper rustle & perforated tearing sound (zipper rip)
+    const duration = 0.45;
+    const bufferSize = Math.floor(ctx.sampleRate * duration);
     const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-      output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.08));
+      // Modulate noise to mimic paper zipper teeth tearing (crackling pulses)
+      const pulse = (Math.sin(i * 0.08) > 0.2 ? 1.5 : 0.4);
+      output[i] = (Math.random() * 2 - 1) * pulse * Math.exp(-i / (ctx.sampleRate * 0.25));
     }
     const whiteNoise = ctx.createBufferSource();
     whiteNoise.buffer = noiseBuffer;
     const filter = ctx.createBiquadFilter();
     filter.type = "bandpass";
-    filter.frequency.setValueAtTime(1600, now);
-    filter.Q.setValueAtTime(2.5, now);
+    filter.frequency.setValueAtTime(2200, now);
+    filter.frequency.exponentialRampToValueAtTime(800, now + duration);
+    filter.Q.setValueAtTime(2.2, now);
     const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.28, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    noiseGain.gain.setValueAtTime(0.35, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
     whiteNoise.connect(filter);
     filter.connect(noiseGain);
     noiseGain.connect(ctx.destination);
@@ -86,7 +90,7 @@ export function playUnsealSound() {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "sine";
-      const startAt = now + 0.08 + idx * 0.07;
+      const startAt = now + 0.12 + idx * 0.08;
       osc.frequency.setValueAtTime(freq, startAt);
       gain.gain.setValueAtTime(0, startAt);
       gain.gain.linearRampToValueAtTime(0.24, startAt + 0.02);

@@ -345,7 +345,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
                 data={userData}
                 companyName={companyName}
                 companyLogo={companyLogo}
-                initialStage="envelope"
+                initialStage="card"
                 onClose={() => setIsModalOpen(false)}
               />
             )}

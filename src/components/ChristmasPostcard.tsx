@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock, ShieldAlert } from "lucide-react";
-import { playJingleBellsMelody, fireGrandConfetti, playSuspenseWarningSound } from "./WelcomeLetter";
+import { playJingleBellsMelody, fireGrandConfetti, playSuspenseWarningSound, playUnsealSound } from "./WelcomeLetter";
 import { RevealData } from "./UnboxForm";
 
 const emptySubscribe = () => () => {};
@@ -29,6 +29,7 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
   const [pendingData, setPendingData] = useState<RevealData | null>(null);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [hasConfirmedAlone, setHasConfirmedAlone] = useState(false);
+  const [isTearing, setIsTearing] = useState(false);
 
   const isMounted = useSyncExternalStore(
     emptySubscribe,
@@ -87,9 +88,13 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
   const handleConfirmAndProceed = () => {
     if (!pendingData) return;
     setShowWarningModal(false);
-    playJingleBellsMelody();
+    setIsTearing(true);
+    playUnsealSound();
     fireGrandConfetti();
-    onSuccess?.(pendingData);
+    setTimeout(() => {
+      playJingleBellsMelody();
+      onSuccess?.(pendingData);
+    }, 1800);
   };
 
   return (
@@ -365,17 +370,28 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                     {/* Error Notification */}
                     {errorMsg && <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs text-red-700 font-medium">⚠️ {errorMsg}</div>}
 
-                    {/* Submit Button (Wax seal style / Festive Postcard Stamp Action) */}
-                    <div className="pt-3">
+                    {/* Submit Button (Envelope Tear Strip / Wax Seal Action) */}
+                    <div className="pt-3 relative">
+                      {/* Decorative perforated tear-strip indicator */}
+                      <div className="flex items-center gap-2 mb-2 px-1 opacity-70">
+                        <span className="text-xs select-none">✂️</span>
+                        <div className="flex-1 border-t-2 border-dashed border-stone-400" />
+                        <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-stone-500">
+                          XÉ THƯ NIÊM PHONG
+                        </span>
+                        <div className="flex-1 border-t-2 border-dashed border-stone-400" />
+                        <span className="text-xs select-none">💌</span>
+                      </div>
+
                       <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoading || isTearing}
                         className="btn-shimmer group w-full py-3.5 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-xs min-[360px]:text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-98 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
                       >
                         {isLoading ? (
                           <>
                             <Gift className="w-5 h-5 animate-spin text-yellow-200" />
-                            <span>Đang bóc tem &amp; mở thư...</span>
+                            <span>Đang kiểm tra mật mã thư...</span>
                           </>
                         ) : (
                           <>
@@ -398,6 +414,66 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
               </div>
             </div>
           </div>
+
+          {/* ========================================================================= */}
+          {/* PHYSICAL ENVELOPE TEARING & UNSEALING ANIMATION (XÉ THƯ TRỰC TIẾP TẠI ĐÂY) */}
+          {/* ========================================================================= */}
+          {isTearing && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center p-3 sm:p-6 overflow-hidden select-none">
+              {/* Dimmed backdrop with paper texture */}
+              <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-[2px] transition-opacity duration-300" />
+
+              {/* Top Perforated Flap lifting open in 3D */}
+              <div className="absolute top-0 left-0 right-0 h-1/2 origin-top animate-flap-peel bg-gradient-to-b from-[#fffaf0] via-[#fef6e9] to-[#faeee3] border-b-2 border-dashed border-amber-300 shadow-[0_15px_30px_rgba(0,0,0,0.25)] z-20 flex items-end justify-between px-6 pb-2 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-stone-400">
+                <span>✦ AIR MAIL • CONFIDENTIAL ✦</span>
+                <span>OPENING... 💌</span>
+              </div>
+
+              {/* The Perforated Tear Zipper Line Ripping Across */}
+              <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-10 flex items-center pointer-events-none z-30">
+                {/* Glowing Spark Trail */}
+                <div className="absolute inset-0 animate-tear-glow bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+
+                {/* Perforated dashed rip line */}
+                <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#d97706_0px,#d97706_8px,transparent_8px,transparent_16px)] animate-tear-strip" />
+
+                {/* Animated Scissors / Pull-tab cutting through */}
+                <div className="absolute top-1/2 -translate-y-1/2 text-3xl sm:text-4xl animate-tear-scissor filter drop-shadow-[0_0_12px_rgba(245,158,11,1)]">
+                  ✂️
+                </div>
+              </div>
+
+              {/* Secret Santa Invitation Letter Rising out of the Envelope */}
+              <div className="relative z-40 max-w-lg w-full bg-gradient-to-b from-[#fffef7] via-[#fff8ed] to-[#fdedd9] p-6 sm:p-8 rounded-3xl border-2 border-amber-400 shadow-[0_25px_60px_rgba(0,0,0,0.4)] text-center animate-letter-rise">
+                <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-red-600 to-rose-600 text-white mb-3 shadow-lg shadow-red-500/30 border border-amber-200 animate-bounce">
+                  <Gift className="w-8 h-8" />
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[11px] font-black uppercase tracking-widest text-amber-700 bg-amber-100/90 px-3 py-0.5 rounded-full border border-amber-300 inline-block">
+                    💌 BỨC THƯ ĐÃ ĐƯỢC XÉ MỞ
+                  </span>
+                  <h3 className="font-script font-bold text-3xl sm:text-4xl text-red-700 leading-tight drop-shadow-xs">
+                    Merry Christmas!
+                  </h3>
+                </div>
+
+                <p className="mt-2 text-sm sm:text-base font-bold text-stone-800">
+                  Chào mừng <span className="text-red-600">{pendingData?.currentUser?.name || email}</span>!
+                </p>
+
+                <p className="mt-1 text-xs sm:text-sm text-stone-600 font-medium leading-snug">
+                  Nhiệm vụ trao quà và danh tính người nhận đang được giải mã...
+                </p>
+
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-100/90 py-2 px-4 rounded-xl border border-emerald-300 w-fit mx-auto shadow-xs">
+                  <span className="animate-spin text-sm">❄️</span>
+                  <span>ĐANG MỞ CÁNH CỔNG ĐÊM TIỆC...</span>
+                  <span className="animate-spin text-sm">❄️</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
