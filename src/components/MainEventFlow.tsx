@@ -189,7 +189,6 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
           companyName={companyName}
           companyLogo={companyLogo}
           currentUser={step === "event" ? userData?.currentUser : null}
-          onLogout={handleLogout}
           onReopenLetter={() => setIsReopeningPostcard(true)}
         />
 

@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import { LogOut } from "lucide-react";
-
 interface NavbarProps {
   companyName?: string;
   companyLogo?: string;
@@ -85,17 +83,6 @@ export default function Navbar({
             <span>💌</span>
             <span className="hidden sm:inline">Thư Mời</span>
           </button>
-
-          {currentUser && onLogout && (
-            <button
-              onClick={onLogout}
-              className="flex items-center gap-1 py-1.5 sm:py-2 px-2 sm:px-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-stone-900 font-medium text-xs rounded-xl transition shadow-xs active:scale-95 cursor-pointer shrink-0"
-              title="Đổi tài khoản / Đăng xuất"
-            >
-              <LogOut className="w-3.5 h-3.5 text-stone-500" />
-              <span className="hidden md:inline">Đổi tài khoản</span>
-            </button>
-          )}
         </div>
       </div>
     </nav>
