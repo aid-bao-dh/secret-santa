@@ -21,7 +21,14 @@ interface ChristmasPostcardProps {
   onClose?: () => void;
 }
 
-export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customRules, currentUser, onSuccess, onClose }: ChristmasPostcardProps) {
+export default function ChristmasPostcard({
+  companyName = "GLOBAL SAFE",
+  companyLogo = "/assets/logo.png",
+  customRules,
+  currentUser,
+  onSuccess,
+  onClose,
+}: ChristmasPostcardProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -163,8 +170,8 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
               </div>
             </div>
 
-            {/* Center Hero: Wax Seal & Action Button */}
-            <div className="my-auto py-6 relative z-30 flex flex-col items-center justify-center text-center space-y-4 max-w-xl mx-auto w-full">
+            {/* Center Hero: Wax Seal Stamp with Company Logo & Clean Action Button */}
+            <div className="my-auto py-5 sm:py-7 relative z-30 flex flex-col items-center justify-center text-center space-y-4 max-w-xl mx-auto w-full">
               {/* Animated Scissor Tearing Line across center during unsealing */}
               {isTearingEnvelope && (
                 <div className="absolute inset-x-[-40px] top-1/2 -translate-y-1/2 h-10 flex items-center pointer-events-none z-40">
@@ -176,51 +183,86 @@ export default function ChristmasPostcard({ companyName = "GLOBAL SAFE", customR
                 </div>
               )}
 
-              {/* 3D Crimson Red Wax Seal Button */}
-              <button
-                type="button"
-                onClick={handleUnsealEnvelope}
-                disabled={isTearingEnvelope}
-                className="relative group cursor-pointer focus:outline-none transition-transform hover:scale-105 active:scale-95"
-                title="Nhấn để xé niêm phong mở thư"
-              >
-                {/* Wax Seal Ribbon Tails */}
-                <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none -z-10">
-                  <div className="w-3.5 h-12 bg-gradient-to-b from-red-700 to-red-900 -rotate-12 shadow-sm rounded-b-xs" />
-                  <div className="w-3.5 h-12 bg-gradient-to-b from-red-700 to-red-900 rotate-12 shadow-sm rounded-b-xs" />
-                </div>
-
-                {/* 3D Wax Seal Circle */}
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-900 p-1 shadow-lg border-2 border-amber-300/80 flex flex-col items-center justify-center animate-seal-pulse">
-                  <div className="w-full h-full rounded-full border border-dashed border-amber-200/50 flex flex-col items-center justify-center text-amber-100">
-                    <span className="text-2xl sm:text-3xl select-none group-hover:rotate-12 transition-transform">🎄</span>
-                    <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-amber-200 mt-0.5">TOP SECRET</span>
-                  </div>
-                </div>
-              </button>
-
-              {/* Envelope Headline */}
-              <div className="space-y-1 pt-1">
-                <h2 className="font-script font-bold text-3xl sm:text-5xl text-[#1e3a8a] drop-shadow-xs">
-                  Bức Thư Mời Niêm Phong ❄️
-                </h2>
-                <p className="text-xs sm:text-sm text-stone-600 font-medium">
-                  Phong bì chứa mật mã và thẻ tham gia sự kiện Secret Santa 2026 dành cho bạn.
-                </p>
+              {/* Elegant Festive Badge (Clean & Tasteful) */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-100/90 border border-red-300 text-red-900 text-xs sm:text-sm font-bold tracking-wider uppercase shadow-xs">
+                <span>🎄</span>
+                <span>Mật Thư Giáng Sinh • {companyName} 2026</span>
               </div>
 
-              {/* Action Button */}
-              <div className="pt-1">
+              {/* Grand Crimson Wax Seal Stamp (Ấn Niêm Phong Hoàng Gia Dập Logo Công Ty) */}
+              <div className="relative pt-1 pb-3 flex flex-col items-center">
                 <button
                   type="button"
                   onClick={handleUnsealEnvelope}
                   disabled={isTearingEnvelope}
-                  className="btn-shimmer group relative mx-auto py-3.5 sm:py-4 px-6 sm:px-10 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 hover:from-red-500 hover:to-emerald-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-red-600/35 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 border-2 border-amber-300 cursor-pointer flex items-center justify-center gap-3 select-none"
+                  className="relative group cursor-pointer focus:outline-none transition-all duration-300 hover:scale-105 active:scale-95"
+                  title="Nhấn vào ấn niêm phong để mở thư"
                 >
-                  <span className="text-xl sm:text-2xl group-hover:rotate-12 transition-transform">✂️</span>
-                  <span>{isTearingEnvelope ? "ĐANG XÉ PHONG BÌ..." : "XÉ PHONG BÌ & MỞ BƯU THIẾP"}</span>
-                  <span className="text-xl sm:text-2xl animate-bounce">💌</span>
+                  {/* Luxury Silk Ribbon Tails */}
+                  <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 flex items-center justify-center gap-1.5 pointer-events-none -z-10">
+                    <div
+                      className="w-4 sm:w-5 h-16 sm:h-20 bg-gradient-to-b from-red-700 via-rose-800 to-red-950 -rotate-12 shadow-lg border-r border-amber-400/40"
+                      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%)" }}
+                    />
+                    <div
+                      className="w-4 sm:w-5 h-16 sm:h-20 bg-gradient-to-b from-red-700 via-rose-800 to-red-950 rotate-12 shadow-lg border-l border-amber-400/40"
+                      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%)" }}
+                    />
+                  </div>
+
+                  {/* 3D Wax Seal Body */}
+                  <div className="w-28 h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-950 p-2 shadow-[0_14px_32px_rgba(153,27,27,0.45),inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-4px_6px_rgba(0,0,0,0.6)] border-2 sm:border-[3px] border-amber-300/80 flex items-center justify-center transition-all group-hover:shadow-[0_18px_40px_rgba(185,28,28,0.6),inset_0_2px_4px_rgba(255,255,255,0.5)]">
+                    {/* Inner Recessed Stamp Bed (Mặt ấn sáp dập chìm) */}
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-red-800 via-rose-900 to-red-950 shadow-[inset_0_3px_8px_rgba(0,0,0,0.65)] border border-dashed border-amber-300/40 flex items-center justify-center relative overflow-hidden">
+                      {/* SVG Arched Text Border */}
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none select-none" viewBox="0 0 120 120">
+                        <defs>
+                          <path id="sealTopArc" d="M 18,60 A 42,42 0 0,1 102,60" fill="none" />
+                          <path id="sealBottomArc" d="M 18,60 A 42,42 0 0,0 102,60" fill="none" />
+                        </defs>
+                        <text className="text-[7.5px] sm:text-[8px] font-mono font-black uppercase tracking-[2px] fill-amber-200" style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.8))" }}>
+                          <textPath href="#sealTopArc" startOffset="50%" textAnchor="middle">
+                            ★ {companyName} ★
+                          </textPath>
+                        </text>
+                        <text className="text-[7px] sm:text-[7.5px] font-mono font-black uppercase tracking-[1.8px] fill-amber-200" style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.8))" }}>
+                          <textPath href="#sealBottomArc" startOffset="50%" textAnchor="middle">
+                            SECRET SANTA 2026
+                          </textPath>
+                        </text>
+                      </svg>
+
+                      {/* Center Company Logo Embossed in Gold / Ivory */}
+                      <div className="relative z-10 flex flex-col items-center justify-center px-2 py-1 max-w-[65px] sm:max-w-[78px]">
+                        <img
+                          src={companyLogo || "/assets/logo.png"}
+                          alt={companyName}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/assets/logo.png";
+                          }}
+                          className="h-6 sm:h-7.5 w-auto max-w-full object-contain filter brightness-0 invert opacity-95 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] group-hover:scale-105 transition-transform select-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </button>
+              </div>
+
+              {/* Action Button & Subtle Hint */}
+              <div className="pt-1 flex flex-col items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleUnsealEnvelope}
+                  disabled={isTearingEnvelope}
+                  className="group relative inline-flex items-center gap-2.5 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-sm sm:text-base rounded-full shadow-lg shadow-red-700/25 border border-amber-300/70 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer select-none"
+                >
+                  <span className="text-base sm:text-lg group-hover:rotate-12 transition-transform">✂️</span>
+                  <span>{isTearingEnvelope ? "Đang mở thư..." : "Chạm để mở thư"}</span>
+                  <span className="text-base sm:text-lg">💌</span>
+                </button>
+                <span className="text-[11px] sm:text-xs text-stone-500 font-medium italic">
+                  (Chạm vào ấn sáp hoặc nút để mở thư)
+                </span>
               </div>
             </div>
 
