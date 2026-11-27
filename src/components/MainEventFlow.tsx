@@ -108,7 +108,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
     } catch {
       // ignore storage errors
     }
-    setIsModalOpen(true);
+    setIsModalOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

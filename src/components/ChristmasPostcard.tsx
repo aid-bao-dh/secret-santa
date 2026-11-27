@@ -38,6 +38,7 @@ export default function ChristmasPostcard({
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [hasConfirmedAlone, setHasConfirmedAlone] = useState(false);
   const [isTearing, setIsTearing] = useState(false);
+  const [isEnteringEvent, setIsEnteringEvent] = useState(false);
   const [isEnvelopeOpened, setIsEnvelopeOpened] = useState(currentUser ? true : false);
   const [isTearingEnvelope, setIsTearingEnvelope] = useState(false);
 
@@ -122,13 +123,13 @@ export default function ChristmasPostcard({
   const handleConfirmAndProceed = () => {
     if (!pendingData) return;
     setShowWarningModal(false);
-    setIsTearing(true);
+    setIsEnteringEvent(true);
     playUnsealSound();
     fireGrandConfetti();
     setTimeout(() => {
       playJingleBellsMelody();
       onSuccess?.(pendingData);
-    }, 1800);
+    }, 950);
   };
 
   return (
@@ -719,6 +720,37 @@ export default function ChristmasPostcard({
                 background: "repeating-linear-gradient(-45deg, #dc2626 0px, #dc2626 12px, #000 12px, #000 24px)",
               }}
             />
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ========================================================================= */}
+      {/* FESTIVE EVENT PORTAL TRANSITION SCREEN (MÀN LOADING TIẾN VÀO SỰ KIỆN)      */}
+      {/* ========================================================================= */}
+      {isEnteringEvent && isMounted && createPortal(
+        <div className="fixed inset-0 z-[10000] bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center animate-pop-in select-none">
+          {/* Glowing Animated Gift Box Icon */}
+          <div className="relative mb-5">
+            <div className="absolute inset-0 bg-red-500/40 rounded-full blur-2xl animate-pulse" />
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-br from-red-600 via-rose-600 to-amber-500 border-2 border-amber-300 shadow-[0_0_60px_rgba(239,68,68,0.7)] flex items-center justify-center text-5xl sm:text-6xl animate-bounce">
+              🎁
+            </div>
+          </div>
+
+          <h3 className="font-holiday font-black text-2xl sm:text-4xl text-amber-300 drop-shadow-md mb-2">
+            Đang mở cổng sự kiện Secret Santa...
+          </h3>
+
+          <p className="text-xs sm:text-sm text-stone-200 font-medium max-w-sm leading-relaxed mb-6">
+            Đã xác thực thành công! Đang đưa bạn vào không gian Giáng Sinh {companyName} ✨
+          </p>
+
+          {/* Festive Pulsing Dots Indicator */}
+          <div className="flex items-center gap-2.5">
+            <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
+            <span className="w-3 h-3 rounded-full bg-amber-400 animate-ping [animation-delay:150ms]" />
+            <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping [animation-delay:300ms]" />
           </div>
         </div>,
         document.body
