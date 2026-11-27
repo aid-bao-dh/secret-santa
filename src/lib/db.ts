@@ -397,7 +397,7 @@ export async function getSettings(): Promise<ISettings> {
     const doc = await SettingsModel.findOneAndUpdate(
       { key: "global" },
       { $setOnInsert: { key: "global", ...DEFAULT_SETTINGS } },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: "after" }
     ).lean<LeanSettings | null>();
     return {
       rules: doc?.rules || DEFAULT_SETTINGS.rules,
@@ -422,7 +422,7 @@ export async function updateSettings(partial: Partial<ISettings>): Promise<ISett
     const updated = await SettingsModel.findOneAndUpdate(
       { key: "global" },
       { $set: partial },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: "after" }
     ).lean<LeanSettings | null>();
     return {
       rules: updated?.rules || DEFAULT_SETTINGS.rules,
