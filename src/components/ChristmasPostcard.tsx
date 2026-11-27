@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock, ShieldAlert } from "lucide-react";
+import { Gift, ArrowRight, ShieldCheck, HeartHandshake, AlertTriangle, Mail, Lock, ShieldAlert, Eye, EyeOff } from "lucide-react";
 import { playJingleBellsMelody, fireGrandConfetti, playSuspenseWarningSound, playUnsealSound } from "./WelcomeLetter";
 import { RevealData } from "./UnboxForm";
 
@@ -31,6 +31,7 @@ export default function ChristmasPostcard({
 }: ChristmasPostcardProps) {
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pendingData, setPendingData] = useState<RevealData | null>(null);
@@ -39,6 +40,18 @@ export default function ChristmasPostcard({
   const [isTearing, setIsTearing] = useState(false);
   const [isEnvelopeOpened, setIsEnvelopeOpened] = useState(currentUser ? true : false);
   const [isTearingEnvelope, setIsTearingEnvelope] = useState(false);
+
+  useEffect(() => {
+    if (!showWarningModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowWarningModal(false);
+        setPendingData(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showWarningModal]);
 
   const isMounted = useSyncExternalStore(
     emptySubscribe,
@@ -62,7 +75,7 @@ export default function ChristmasPostcard({
     e.preventDefault();
     setErrorMsg(null);
 
-    const cleanEmail = email.trim();
+    const cleanEmail = email.trim().toLowerCase();
     const cleanPhone = phoneLast4.trim();
 
     if (!cleanEmail || !cleanPhone) {
@@ -499,10 +512,13 @@ export default function ChristmasPostcard({
                       </div>
 
                       <div className="relative">
-                        <Mail className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
+                        <Mail className="w-4 h-4 text-stone-400 absolute left-1 top-2.5 pointer-events-none" />
                         <input
                           id="postcard-email"
                           type="email"
+                          autoComplete="email"
+                          autoCapitalize="none"
+                          spellCheck={false}
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -522,18 +538,29 @@ export default function ChristmasPostcard({
                       </div>
 
                       <div className="relative">
-                        <Lock className="w-4 h-4 text-stone-400 absolute left-1 top-2.5" />
+                        <Lock className="w-4 h-4 text-stone-400 absolute left-1 top-2.5 pointer-events-none" />
                         <input
                           id="postcard-pass"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           inputMode="numeric"
+                          pattern="[0-9]*"
                           maxLength={4}
+                          autoComplete="one-time-code"
                           required
                           value={phoneLast4}
                           onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, ""))}
                           placeholder="•••• (4 chữ số)"
-                          className="w-full pl-7 pr-2 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal tracking-widest transition"
+                          className="w-full pl-7 pr-8 py-1.5 bg-transparent border-b-2 border-stone-400 focus:border-red-600 outline-none text-sm sm:text-base font-semibold text-stone-900 placeholder:text-stone-400 placeholder:font-normal tracking-widest transition"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute right-1 top-2 text-stone-400 hover:text-stone-700 transition cursor-pointer p-0.5 focus:outline-none"
+                          title={showPassword ? "Ẩn mã số" : "Hiện mã số"}
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
                       </div>
                     </div>
 

@@ -6,18 +6,21 @@ const dancingScript = Dancing_Script({
   variable: "--font-dancing",
   subsets: ["latin", "vietnamese"],
   weight: ["600", "700"],
+  display: "swap",
 });
 
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {

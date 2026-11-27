@@ -46,7 +46,7 @@ export default function SnowEffect() {
       {FLAKES.map((f) => (
         <span
           key={f.id}
-          className="snowflake"
+          className={`snowflake ${f.id >= 18 ? "hidden sm:inline-block" : ""}`}
           style={{
             left: `${f.left}%`,
             fontSize: `${f.size}px`,

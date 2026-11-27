@@ -34,9 +34,9 @@ export default function FairyLights() {
         {bulbs.map((bulbClass, i) => (
           <div
             key={i}
-            className={`flex flex-col items-center flex-1 ${
+            className={`flex-col items-center flex-1 ${
               i % 2 === 0 ? "animate-sway" : "animate-sway-reverse"
-            }`}
+            } ${i % 2 !== 0 ? "hidden min-[520px]:flex" : "flex"}`}
             style={{ animationDelay: `${(i % 5) * 0.25}s` }}
           >
             {/* Green wire socket */}

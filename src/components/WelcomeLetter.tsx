@@ -22,13 +22,31 @@ function formatDayMonth(dateStr?: string, fallback = "27/11"): string {
   return match ? `${match[3]}/${match[2]}` : fallback;
 }
 
-export function playChristmasChime() {
+let sharedAudioCtx: AudioContext | null = null;
+
+function getSharedAudioContext(): AudioContext | null {
   try {
+    if (typeof window === "undefined") return null;
     const AudioCtx =
       window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
+    if (!AudioCtx) return null;
+    if (!sharedAudioCtx || sharedAudioCtx.state === "closed") {
+      sharedAudioCtx = new AudioCtx();
+    }
+    if (sharedAudioCtx.state === "suspended") {
+      sharedAudioCtx.resume().catch(() => {});
+    }
+    return sharedAudioCtx;
+  } catch {
+    return null;
+  }
+}
+
+export function playChristmasChime() {
+  try {
+    const ctx = getSharedAudioContext();
+    if (!ctx) return;
 
     // Bright glockenspiel chord (C5, E5, G5, C6)
     const notes = [523.25, 659.25, 783.99, 1046.5];
@@ -52,11 +70,8 @@ export function playChristmasChime() {
 
 export function playUnsealSound() {
   try {
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
+    const ctx = getSharedAudioContext();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
     // 1. Crisp paper rustle & perforated tearing sound (zipper rip)
@@ -107,11 +122,8 @@ export function playUnsealSound() {
 
 export function playJingleBellsMelody() {
   try {
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
+    const ctx = getSharedAudioContext();
+    if (!ctx) return;
 
     const melody: Array<{ freq: number; time: number; dur: number }> = [
       { freq: 659.25, time: 0.0, dur: 0.22 },
@@ -148,11 +160,8 @@ export function playJingleBellsMelody() {
 
 export function playSuspenseWarningSound() {
   try {
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
+    const ctx = getSharedAudioContext();
+    if (!ctx) return;
 
     // Dramatic two-tone radar alert (A4 -> C#5 -> A4)
     const tones = [
