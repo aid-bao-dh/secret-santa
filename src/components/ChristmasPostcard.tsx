@@ -50,10 +50,10 @@ export default function ChristmasPostcard({
     if (isTearingEnvelope) return;
     setIsTearingEnvelope(true);
     playUnsealSound();
-    fireGrandConfetti();
     setTimeout(() => {
       setIsEnvelopeOpened(true);
       setIsTearingEnvelope(false);
+      fireGrandConfetti();
       playJingleBellsMelody();
     }, 750);
   };
@@ -172,12 +172,15 @@ export default function ChristmasPostcard({
 
             {/* Center Hero: Wax Seal Stamp with Company Logo & Clean Action Button */}
             <div className="my-auto py-5 sm:py-7 relative z-30 flex flex-col items-center justify-center text-center space-y-4 max-w-xl mx-auto w-full">
-              {/* Animated Scissor Tearing Line across center during unsealing */}
+              {/* Animated Scissor Tearing Line across center during unsealing (GPU Composited) */}
               {isTearingEnvelope && (
                 <div className="absolute inset-x-[-40px] top-1/2 -translate-y-1/2 h-10 flex items-center pointer-events-none z-40">
                   <div className="absolute inset-0 animate-tear-glow bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
                   <div className="w-full h-1 bg-[repeating-linear-gradient(90deg,#d97706_0px,#d97706_8px,transparent_8px,transparent_16px)] animate-tear-strip" />
-                  <div className="absolute top-1/2 -translate-y-1/2 text-3xl sm:text-4xl animate-tear-scissor filter drop-shadow-[0_0_12px_rgba(245,158,11,1)]">
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 text-3xl sm:text-4xl animate-tear-scissor select-none pointer-events-none"
+                    style={{ textShadow: "0 0 10px rgba(245,158,11,0.9)" }}
+                  >
                     ✂️
                   </div>
                 </div>

@@ -144,7 +144,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
       {/* REOPENED POSTCARD MODAL (WHEN VIEWING FROM EVENT HUB) */}
       {isReopeningPostcard && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in"
+          className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-6 animate-pop-in"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsReopeningPostcard(false);
           }}
@@ -173,12 +173,10 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[#fafaf9]" />
         <div
-          className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/[0.04] rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: "6s" }}
+          className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/[0.04] rounded-full blur-3xl pointer-events-none"
         />
         <div
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/[0.04] rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: "7s" }}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/[0.04] rounded-full blur-3xl pointer-events-none"
         />
       </div>
 
@@ -211,7 +209,7 @@ export default function MainEventFlow({ settings }: MainEventFlowProps) {
         {/* SCREEN 1: BƯU THIẾP GIÁNG SINH (POSTCARD) — MỞ MODAL RA KHI VÀO TRANG, KHÔNG CÓ NÚT TẮT */}
         {/* ========================================================================= */}
         {step === "login" && (
-          <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6 animate-pop-in">
+          <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-6 animate-pop-in">
             <div className="relative w-full sm:w-[90vw] max-w-6xl my-auto">
               <ChristmasPostcard
                 companyName={companyName}

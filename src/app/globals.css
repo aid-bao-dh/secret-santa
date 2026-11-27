@@ -74,35 +74,52 @@ body {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-fill-mode: backwards;
-  filter: drop-shadow(0 2px 4px rgba(148, 163, 184, 0.35));
+  text-shadow: 0 1px 3px rgba(148, 163, 184, 0.4);
   will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
-/* Twinkling Christmas Fairy Lights */
+/* Twinkling Christmas Fairy Lights - Hardware-Accelerated (Zero Repaint) */
 @keyframes twinkle1 {
-  0%, 100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8)); }
-  50% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.3)); }
+  0%, 100% { opacity: 1; transform: scale(1.1); }
+  50% { opacity: 0.45; transform: scale(0.92); }
 }
 
 @keyframes twinkle2 {
-  0%, 100% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.3)); }
-  50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.8)); }
+  0%, 100% { opacity: 0.45; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.1); }
 }
 
 @keyframes twinkle3 {
-  0%, 100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.8)); }
-  50% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.3)); }
+  0%, 100% { opacity: 1; transform: scale(1.1); }
+  50% { opacity: 0.45; transform: scale(0.92); }
 }
 
 @keyframes twinkle4 {
-  0%, 100% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.3)); }
-  50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.8)); }
+  0%, 100% { opacity: 0.45; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.1); }
 }
 
-.bulb-red { animation: twinkle1 1.6s infinite ease-in-out; }
-.bulb-gold { animation: twinkle2 1.4s infinite ease-in-out; }
-.bulb-green { animation: twinkle3 1.8s infinite ease-in-out; }
-.bulb-blue { animation: twinkle4 1.5s infinite ease-in-out; }
+.bulb-red {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.75), 0 0 4px rgba(239, 68, 68, 0.4);
+  animation: twinkle1 1.6s infinite ease-in-out;
+  will-change: opacity, transform;
+}
+.bulb-gold {
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.75), 0 0 4px rgba(234, 179, 8, 0.4);
+  animation: twinkle2 1.4s infinite ease-in-out;
+  will-change: opacity, transform;
+}
+.bulb-green {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.75), 0 0 4px rgba(16, 185, 129, 0.4);
+  animation: twinkle3 1.8s infinite ease-in-out;
+  will-change: opacity, transform;
+}
+.bulb-blue {
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.75), 0 0 4px rgba(56, 189, 248, 0.4);
+  animation: twinkle4 1.5s infinite ease-in-out;
+  will-change: opacity, transform;
+}
 
 /* Gentle Pendulum Sway for hanging lights */
 @keyframes sway {
@@ -450,14 +467,14 @@ body {
 /* ========================================================================= */
 @keyframes tearStripLine {
   0% {
-    width: 0%;
+    transform: scaleX(0);
     opacity: 0.3;
   }
   15% {
     opacity: 1;
   }
   100% {
-    width: 100%;
+    transform: scaleX(1);
     opacity: 1;
   }
 }
@@ -472,11 +489,11 @@ body {
     opacity: 1;
   }
   50% {
-    transform: translateY(-55%) rotate(15deg) scale(1.2);
+    transform: translateY(-55%) rotate(15deg) scale(1.15);
   }
   90% {
     opacity: 1;
-    transform: translateY(-45%) rotate(-10deg) scale(1.15);
+    transform: translateY(-45%) rotate(-10deg) scale(1.1);
   }
   100% {
     left: 100%;
@@ -525,11 +542,14 @@ body {
 }
 
 .animate-tear-strip {
+  transform-origin: left center;
   animation: tearStripLine 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  will-change: transform;
 }
 
 .animate-tear-scissor {
   animation: tearScissor 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  will-change: left, transform;
 }
 
 .animate-flap-peel {
@@ -574,11 +594,11 @@ body {
 @keyframes sealGlowPulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 15px rgba(220, 38, 38, 0.45));
+    opacity: 0.95;
   }
   50% {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.8)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
+    transform: scale(1.03);
+    opacity: 1;
   }
 }
 
